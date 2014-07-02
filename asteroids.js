@@ -1,4 +1,4 @@
-var ship = { x: 0, y: 0, rot: 0, thrust: false };
+var ship = { x: 0, y: 0, rot: 0, thrust: false, dx: 0, dy: 0 };
 
 var keys = {};
 
@@ -17,6 +17,20 @@ var SHIP_WIDTH = 20;
 var SHIP_LEN = 20;
 var KEYS = { LEFT: 39, RIGHT: 37, UP: 38, DOWN: 40 }
 var SHIP_ROT_SPEED = 2;
+
+function updatePosition(entity) {
+  entity.x += entity.dx;
+  entity.y += entity.dy;
+  
+  // TODO: global width and height that aren't on canvas
+  var w = renderingContext.canvas.width;
+  var h = renderingContext.canvas.height;
+
+  while (entity.x > w) { entity.x -= w; }
+  while (entity.x < 0) { entity.x += w; } 
+  while (entity.y > h) { entity.y -= h; }
+  while (entity.y < 0) { entity.y += h; }
+}
 
 function resetGame(w, h) {
   ship.x = w / 2;
@@ -67,6 +81,13 @@ function updateSim() {
   }
 
   ship.thrust = keys[KEYS.UP];
+  
+  if (ship.thrust) {
+    ship.dy += Math.cos(ship.rot);
+    ship.dx -= Math.sin(ship.rot);
+  }
+
+  updatePosition(ship);
 }
 
 function everyNSeconds(n, callback) {
@@ -96,7 +117,8 @@ function update(time, delta) {
   everyNSeconds(0.05, function() {
     debugConsole.textContent = 'keys: ' + JSON.stringify(keys) + '\n';
     debugConsole.textContent += 'delta: ' + delta + '\n';
-    debugConsole.textContent += 'fps: ' + Math.round(1000 / delta);
+    debugConsole.textContent += 'fps: ' + Math.round(1000 / delta) + '\n';
+    debugConsole.textContent += 'ship: ' + JSON.stringify(ship);
   });
 }
 
