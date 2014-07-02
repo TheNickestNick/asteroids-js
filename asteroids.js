@@ -6,8 +6,37 @@ var debugConsole = document.createElement('pre');
 
 var canvas = null;
 
-function render(delta) {
-  debugConsole.textContent = 'keys: ' + JSON.stringify(keys) + '\n';
+var frameTime = null;
+
+var simTime = null;
+
+var SIM_STEP_MS = (1000 / 20); // sim runs at 20fps
+
+function performSimulationStep() {
+}
+
+function everyNSeconds(n, callback) {
+  if (simTime % (n * 1000) < SIM_STEP_MS) {
+    callback();
+  }
+}
+
+function render(time, delta) {
+  if (simTime == null) {
+    simTime = time;
+    return;
+  }
+
+  while (simTime + SIM_STEP_MS < time) {
+    simTime += SIM_STEP_MS;
+    performSimulationStep();
+  }
+
+  everyNSeconds(0.05, function() {
+    debugConsole.textContent = 'keys: ' + JSON.stringify(keys) + '\n';
+    debugConsole.textContent += 'delta: ' + delta + '\n';
+    debugConsole.textContent += 'fps: ' + (1000 / delta);
+  });
 }
 
 
@@ -20,8 +49,15 @@ function render(delta) {
     keys[event.which] = false;
   });
 
-  window.requestAnimationFrame(function renderLoop(delta) {
-    render(delta);
+  var prevFrameTime = null;
+  window.requestAnimationFrame(function renderLoop(time) {
+    if (prevFrameTime == null) {
+      prevFrameTime = time;
+    }
+    else {
+      render(time, time - prevFrameTime);
+      prevFrameTime = time;
+    }
     window.requestAnimationFrame(renderLoop);
   });
 
