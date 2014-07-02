@@ -1,4 +1,4 @@
-var ship = { x: 0, y: 0, rot: 0 };
+var ship = { x: 0, y: 0, rot: 0, thrust: false };
 
 var keys = {};
 
@@ -10,9 +10,13 @@ var frameTime = null;
 
 var simTime = null;
 
-var SIM_STEP_MS = (1000 / 20); // sim runs at 20fps
+var SIM_FPS = 20;
+var SIM_DELTA_SEC = 1.0 / SIM_FPS;
+var SIM_STEP_MS = 1000.0 / SIM_FPS;
 var SHIP_WIDTH = 20;
-var SHIP_HEIGHT = 25;
+var SHIP_LEN = 20;
+var KEYS = { LEFT: 39, RIGHT: 37, UP: 38, DOWN: 40 }
+var SHIP_ROT_SPEED = 2;
 
 function resetGame(w, h) {
   ship.x = w / 2;
@@ -25,23 +29,44 @@ function clearCanvas(ctx) {
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
+function path(ctx) {
+  ctx.beginPath();
+  ctx.moveTo(arguments[1][0], arguments[1][1]);
+  for (var i = 2; i < arguments.length; i++) {
+    ctx.lineTo(arguments[i][0], arguments[i][1]);
+  }
+  ctx.closePath();
+}
+
 function renderShip(ctx) {
   ctx.save();
-  ctx.fillStyle = 'red';
   ctx.translate(ship.x, ship.y);
   ctx.rotate(ship.rot);
-  ctx.moveTo(0, SHIP_HEIGHT/2);
-  ctx.beginPath();
-  ctx.lineTo(-SHIP_WIDTH/2, -SHIP_HEIGHT/2);
-  ctx.lineTo(SHIP_WIDTH/2, -SHIP_HEIGHT/2);
-  ctx.lineTo(0, SHIP_HEIGHT/2);
-  ctx.closePath();
+  ctx.translate(0, -SHIP_LEN*0.3);
+
+  ctx.fillStyle = 'red';
+  path(ctx, [0, SHIP_LEN], [-SHIP_WIDTH/2, 0], [SHIP_WIDTH/2, 0]);
   ctx.fill();
+
+  if (ship.thrust) {
+    ctx.fillStyle = 'yellow';
+    path(ctx, [0, -SHIP_LEN/3], [-SHIP_WIDTH/4, 0], [SHIP_WIDTH/4, 0]);
+    ctx.fill();
+  }
+
   ctx.restore();
 }
 
 function updateSim() {
+  if (keys[KEYS.LEFT]) {
+    ship.rot -= SHIP_ROT_SPEED * SIM_DELTA_SEC;
+  }
   
+  if (keys[KEYS.RIGHT]) {
+    ship.rot += SHIP_ROT_SPEED * SIM_DELTA_SEC;
+  }
+
+  ship.thrust = keys[KEYS.UP];
 }
 
 function everyNSeconds(n, callback) {
