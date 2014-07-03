@@ -2,7 +2,6 @@ var ship = { x: 0, y: 0, rot: 0, thrust: false, dx: 0, dy: 0 };
 
 var keys = {};
 
-var debugConsole = document.createElement('pre');
 
 var renderingContext = null;
 
@@ -113,34 +112,46 @@ function update(time, delta) {
   }
 
   renderFrame(renderingContext);
+}
 
-  everyNSeconds(0.05, function() {
-    debugConsole.textContent = 'keys: ' + JSON.stringify(keys) + '\n';
-    debugConsole.textContent += 'delta: ' + delta + '\n';
-    debugConsole.textContent += 'fps: ' + Math.round(1000 / delta) + '\n';
-    debugConsole.textContent += 'ship: ' + JSON.stringify(ship);
-  });
+function debugReplacer(key, val) {
+  return (val && val.toFixed) ? Number(val.toFixed(3)) : val;
+};
+
+function getDebugString(delta) {
+  return ['keys: ' + JSON.stringify(keys, debugReplacer),
+      'delta: ' + delta, 
+      'fps: ' + Math.round(1000 / delta),
+      'ship: ' + JSON.stringify(ship, debugReplacer)
+    ].join('<br/>');
 }
 
 
 (function main() {
-  document.body.addEventListener('keydown', function(event) {
-    keys[event.which] = true;
-  });
+  document.body.addEventListener('keydown', function(event) { keys[event.which] = true; });
+  document.body.addEventListener('keyup', function(event) { keys[event.which] = false; });
 
-  document.body.addEventListener('keyup', function(event) {
-    keys[event.which] = false;
-  });
+  var debugConsole = document.createElement('div');
+  debugConsole.style.width = '100%';
+  debugConsole.style.wordWrap = 'break-word';
 
   var prevFrameTime = null;
+  var prevDebugUpdate = 0;
   window.requestAnimationFrame(function mainLoop(time) {
     if (prevFrameTime == null) {
       prevFrameTime = time;
     }
     else {
+      var delta = time - prevFrameTime;
       update(time, time - prevFrameTime);
       prevFrameTime = time;
     }
+
+    if (time - prevDebugUpdate > 50) {
+      prevDebugUpdate = time;
+      debugConsole.innerHTML = getDebugString(delta);
+    }
+
     window.requestAnimationFrame(mainLoop);
   });
 
