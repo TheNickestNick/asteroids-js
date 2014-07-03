@@ -15,10 +15,11 @@ define(function() {
     },
 
     keys: {
+      SPACE: 32,
       RIGHT: 37,
       UP: 38,
       LEFT: 39,
-      DOWN: 40
+      DOWN: 40,
     }
   }
 });

@@ -1,8 +1,9 @@
 define(['./config', './graphics', './meshes', './input'], 
     function(config, graphics, meshes, input) {
-  var ship = { x: 0, y: 0, rot: 0, thrust: false, dx: 0, dy: 0 };
-
-  var frameTime = null;
+  // TODO: create a "models" module with Ship and Game class
+  // TODO: create a module for handling game loop and timing
+  var ship = { x: 0, y: 0, rot: 0, thrust: false, dx: 0, dy: 0, lastShot: 0 };
+  var bullets = [];
 
   var simTime = null;
 
@@ -49,6 +50,23 @@ define(['./config', './graphics', './meshes', './input'],
     });
   }
 
+  function drawBullets() {
+    for (var i = 0; i < bullets.length; i++) {
+      graphics.drawCircle(bullets[i].x, bullets[i].y, 2, 'white');
+    }
+  }
+
+  function shoot() {
+    if (simTime - ship.lastShot > config.SHIP_SHOOT_DELAY_MS) {
+      ship.lastShot = simTime;
+      bullets.push({
+        x: ship.x, y: ship.y,
+        dx: ship.dx + Math.cos(ship.rot) * config.BULLET_VELOCITY,
+        dy: ship.dy + Math.sin(ship.rot) * config.BULLET_VELOCITY
+      });
+    }
+  }
+
   function updateSim() {
     if (input.keyDown(input.keys.LEFT)) {
       ship.rot -= config.SHIP_ROTATE_SPEED * config.SIM_DELTA_SEC;
@@ -56,6 +74,10 @@ define(['./config', './graphics', './meshes', './input'],
     
     if (input.keyDown(input.keys.RIGHT)) {
       ship.rot += config.SHIP_ROTATE_SPEED * config.SIM_DELTA_SEC;
+    }
+
+    if (input.keyDown(input.keys.SPACE)) {
+      shoot();
     }
 
     ship.thrust = input.keyDown(input.keys.UP);
@@ -71,6 +93,7 @@ define(['./config', './graphics', './meshes', './input'],
   function renderFrame() {
     graphics.clear('black');
     drawShip();
+    drawBullets();
   }
 
   function update(time, delta) {
