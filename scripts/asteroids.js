@@ -61,8 +61,9 @@ define(['./config', './graphics', './meshes', './input'],
       ship.lastShot = simTime;
       bullets.push({
         x: ship.x, y: ship.y,
-        dx: ship.dx + Math.cos(ship.rot) * config.BULLET_VELOCITY,
-        dy: ship.dy + Math.sin(ship.rot) * config.BULLET_VELOCITY
+        dx: ship.dx - Math.sin(ship.rot) * config.BULLET_VELOCITY,
+        dy: ship.dy + Math.cos(ship.rot) * config.BULLET_VELOCITY,
+        born: simTime
       });
     }
   }
@@ -88,6 +89,16 @@ define(['./config', './graphics', './meshes', './input'],
     }
 
     updatePosition(ship);
+
+    for (var i = 0; i < bullets.length; i++) {
+      var b = bullets[i];
+      updatePosition(b);
+
+      if (simTime > b.born + config.BULLET_TTL_MS) {
+        bullets.splice(i, 1);
+        i--;
+      }
+    }
   }
 
   function renderFrame() {
