@@ -1,21 +1,24 @@
 define(['./config', './graphics', './meshes', './input', './simulation'], 
     function(config, graphics, meshes, input, sim) {
 
+  // TODO: we really need a way to separate the model data from the rendering.
+  // I don't like that we have to expose everything via methods on simulation.
   function drawShip() {
     graphics.withContext(function(context) {
       // TODO: figure out a way to abstract these transformations
-      context.translate(ship.x, ship.y);
-      context.rotate(ship.rot);
+      context.translate(sim.ship.x(), sim.ship.y());
+      context.rotate(sim.ship.rot());
     
       graphics.drawMesh(meshes.ship);
 
-      if (ship.thrust) {
+      if (sim.ship.thrust()) {
         graphics.drawMesh(meshes.thrust);
       }
     });
   }
 
   function drawBullets() {
+    var bullets = sim.bullets();
     for (var i = 0; i < bullets.length; i++) {
       graphics.drawCircle(bullets[i].x, bullets[i].y, 2, 'white');
     }
@@ -23,31 +26,21 @@ define(['./config', './graphics', './meshes', './input', './simulation'],
 
   function handleInput() {
     if (input.keyDown(input.keys.LEFT)) {
-      ship.rot -= config.SHIP_ROTATE_SPEED * config.SIM_DELTA_SEC;
+      sim.ship.rotate(-config.SHIP_ROTATE_SPEED);
     }
     
     if (input.keyDown(input.keys.RIGHT)) {
-      sim.ship.rot += config.SHIP_ROTATE_SPEED * config.SIM_DELTA_SEC;
+      sim.ship.rotate(config.SHIP_ROTATE_SPEED);
     }
 
     if (input.keyDown(input.keys.SPACE)) {
       sim.ship.shoot();
     }
 
-    ship.thrust(input.keyDown(input.keys.UP));
-    
-    if (sim.ship.thrust()) {
-      ship.dy += Math.cos(ship.rot);
-      ship.dx -= Math.sin(ship.rot);
-    }
-
+    sim.ship.thrust(input.keyDown(input.keys.UP));
   }
 
-  function update(time) {
-    while (sim.time() + sim.SIM_STEP_MS < time) {
-      sim.step();
-    }
-
+  function drawFrame() {
     graphics.clear('black');
     drawShip();
     drawBullets();
@@ -58,18 +51,18 @@ define(['./config', './graphics', './meshes', './input', './simulation'],
     debugConsole.style.width = '100%';
     debugConsole.style.wordWrap = 'break-word';
 
-    var prevFrameTime = null;
-    var prevDebugUpdate = 0;
     window.requestAnimationFrame(function mainLoop(time) {
-      if (prevFrameTime == null) {
-        prevFrameTime = time;
-      }
-      else {
-        var delta = time - prevFrameTime;
-        update(time, time - prevFrameTime);
-        prevFrameTime = time;
+      if (!sim.started()) {
+        sim.start(time);
       }
 
+      handleInput();
+
+      while (sim.time() + sim.SIM_DELTA_MS < time) {
+        sim.step();
+      }
+
+      drawFrame();
       window.requestAnimationFrame(mainLoop);
     });
 
@@ -77,11 +70,9 @@ define(['./config', './graphics', './meshes', './input', './simulation'],
     canvas.width = config.CANVAS_WIDTH;
     canvas.height = config.CANVAS_HEIGHT;
     document.body.appendChild(canvas);
+
     graphics.init(canvas);
-
-    document.body.appendChild(debugConsole);
-
-    resetGame(canvas.width, canvas.height);
+    sim.init(canvas.width, canvas.height);
   })();
 
   return {

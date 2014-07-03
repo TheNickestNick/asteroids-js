@@ -6,6 +6,9 @@ define(['./config'], function(config) {
   var width = null;
   var height = null;
 
+  var SIM_DELTA_SEC = 1.0 / 20;
+  var SIM_DELTA_MS = 1000.0 / 20;
+
   function updatePosition(entity) {
     entity.x += entity.dx;
     entity.y += entity.dy;
@@ -21,7 +24,7 @@ define(['./config'], function(config) {
       var b = bullets[i];
       updatePosition(b);
 
-      if (simTime > b.born + config.BULLET_TTL_MS) {
+      if (time > b.born + config.BULLET_TTL_MS) {
         bullets.splice(i, 1);
         i--;
       }
@@ -29,14 +32,18 @@ define(['./config'], function(config) {
   }
 
   return {
-    SIM_DELTA_MS: 1000 / 20, // sim runs at 20fps
+    SIM_DELTA_MS: 1000.0 / 20, // sim runs at 20fps
 
     time: function() { return time; },
+    started: function() { return time != null; },
     width: function() { return width; },
     height: function() { return height; },
 
-    init: function(realTime, w, h) {
+    start: function(realTime) {
       time = realTime;
+    },
+
+    init: function(w, h) {
       width = w;
       height = h;
 
@@ -46,26 +53,44 @@ define(['./config'], function(config) {
     },
 
     run: function(realTime) {
-      while (time + this.SIM_DELTA_MS < realTime) {
+      while (time + SIM_DELTA_MS < realTime) {
         step();
-        time += this.SIM_DELTA_MS;
       }
     },
 
     step: function() {
+      if (ship.thrust) {
+        ship.dy += Math.cos(ship.rot);
+        ship.dx -= Math.sin(ship.rot);
+      }
+      
       updatePosition(ship);
       updateBullets();
+
+      time += SIM_DELTA_MS;
+    },
+
+    bullets: function() {
+      return bullets;
     },
 
     ship: {
+      x: function() { return ship.x; },
+      y: function() { return ship.y; },
+      rot: function() { return ship.rot; },
+
+      rotate: function(speed) {
+        ship.rot += speed * SIM_DELTA_SEC;
+      },
+
       shoot: function() {
         if (time - ship.lastShot > config.SHIP_SHOOT_DELAY_MS) {
-          ship.lastShot = simTime;
+          ship.lastShot = time;
           bullets.push({
             x: ship.x, y: ship.y,
             dx: ship.dx - Math.sin(ship.rot) * config.BULLET_VELOCITY,
             dy: ship.dy + Math.cos(ship.rot) * config.BULLET_VELOCITY,
-            born: simTime
+            born: time 
           });
         }
       },
