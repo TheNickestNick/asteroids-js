@@ -42,8 +42,8 @@ define(['./config', './graphics', './meshes', './input', './simulation'],
 
   function drawFrame() {
     graphics.clear('black');
-    drawShip();
     drawBullets();
+    drawShip();
   }
 
   (function main() {
