@@ -5,5 +5,8 @@ define({
   
   KEYS: { LEFT: 39, RIGHT: 37, UP: 38, DOWN: 40 },
   
-  SHIP_ROTATE_SPEED: 2      // Radians/sec.
+  SHIP_ROTATE_SPEED: 2,     // Radians/sec.
+
+  CANVAS_WIDTH: 600,
+  CANVAS_HEIGHT: 600 * (9.0 / 16.0)
 });

@@ -6,6 +6,10 @@ define(function() {
     init: function(canvas_) {
       canvas = canvas_;
       context = canvas.getContext('2d');
+
+      // flip canvas so that (0, 0) is upper-left corner.
+      context.translate(0, canvas.height);
+      context.scale(1, -1);
     },
 
     clear: function(style) {
@@ -17,12 +21,21 @@ define(function() {
 
     drawMesh: function(mesh) {
       context.save();
+    
+      if (mesh.translate && mesh.translate.length > 1) {
+        context.translate.apply(context, mesh.translate);
+      }
+
+      if (mesh.scale && mesh.scale.length > 1) {
+        context.scale.apply(context, mesh.scale);
+      }
+
       context.beginPath();
       
       if (mesh.path && mesh.path.length > 0) {
         context.moveTo(mesh.path[0][0], mesh.path[0][1]);
         
-        for (var i = 2; i < mesh.path.length; i++) {
+        for (var i = 1; i < mesh.path.length; i++) {
           context.lineTo(mesh.path[i][0], mesh.path[i][1]);
         }
       }
@@ -38,6 +51,15 @@ define(function() {
       }
 
       context.restore();
-    }
+    },
+
+    withContext: function(callback) {
+      context.save();
+      callback(context);
+      context.restore();
+    },
+
+    width: function() { return canvas.width; },
+    height: function() { return canvas.height; }
   };
 });

@@ -1,21 +1,22 @@
-define(['./config'], function(config) {
+define(['./config', './graphics', './meshes'], 
+    function(config, graphics, meshes) {
   var ship = { x: 0, y: 0, rot: 0, thrust: false, dx: 0, dy: 0 };
 
   var keys = {};
 
-  var renderingContext = null;
-
   var frameTime = null;
 
   var simTime = null;
+
+  var CANVAS_WIDTH = 1000
 
   function updatePosition(entity) {
     entity.x += entity.dx;
     entity.y += entity.dy;
     
     // TODO: global width and height that aren't on canvas
-    var w = renderingContext.canvas.width;
-    var h = renderingContext.canvas.height;
+    var w = config.CANVAS_WIDTH;
+    var h = config.CANVAS_HEIGHT;
 
     while (entity.x > w) { entity.x -= w; }
     while (entity.x < 0) { entity.x += w; } 
@@ -29,11 +30,6 @@ define(['./config'], function(config) {
     ship.rot = 0;
   }
 
-  function clearCanvas(ctx) {
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  }
-
   function path(ctx) {
     ctx.beginPath();
     ctx.moveTo(arguments[1][0], arguments[1][1]);
@@ -43,26 +39,18 @@ define(['./config'], function(config) {
     ctx.closePath();
   }
 
-  function renderShip(ctx) {
-    var SHIP_LEN = 22;
-    var SHIP_WIDTH = 20;
+  function drawShip() {
+    graphics.withContext(function(context) {
+      // TODO: figure out a way to abstract these transformations
+      context.translate(ship.x, ship.y);
+      context.rotate(ship.rot);
+    
+      graphics.drawMesh(meshes.ship);
 
-    ctx.save();
-    ctx.translate(ship.x, ship.y);
-    ctx.rotate(ship.rot);
-    ctx.translate(0, -SHIP_LEN*0.3);
-
-    ctx.fillStyle = 'red';
-    path(ctx, [0, SHIP_LEN], [-SHIP_WIDTH/2, 0], [SHIP_WIDTH/2, 0]);
-    ctx.fill();
-
-    if (ship.thrust) {
-      ctx.fillStyle = 'yellow';
-      path(ctx, [0, -SHIP_LEN/3], [-SHIP_WIDTH/4, 0], [SHIP_WIDTH/4, 0]);
-      ctx.fill();
-    }
-
-    ctx.restore();
+      if (ship.thrust) {
+        graphics.drawMesh(meshes.thrust);
+      }
+    });
   }
 
   function updateSim() {
@@ -84,9 +72,9 @@ define(['./config'], function(config) {
     updatePosition(ship);
   }
 
-  function renderFrame(ctx) {
-    clearCanvas(ctx);
-    renderShip(ctx);
+  function renderFrame() {
+    graphics.clear('black');
+    drawShip();
   }
 
   function update(time, delta) {
@@ -100,7 +88,7 @@ define(['./config'], function(config) {
       updateSim();
     }
 
-    renderFrame(renderingContext);
+    renderFrame();
   }
 
   function debugReplacer(key, val) {
@@ -111,7 +99,7 @@ define(['./config'], function(config) {
     return ['keys: ' + JSON.stringify(keys, debugReplacer),
         'delta: ' + delta, 
         'fps: ' + Math.round(1000 / delta),
-        'ship: ' + JSON.stringify(ship, debugReplacer)
+        'ship: ' + JSON.stringify(ship, debugReplacer),
       ].join('<br/>');
   }
 
@@ -145,14 +133,10 @@ define(['./config'], function(config) {
     });
 
     var canvas = document.createElement('canvas');
-    canvas.width = 600;
-    canvas.height = canvas.width * (9/16);
+    canvas.width = config.CANVAS_WIDTH;
+    canvas.height = config.CANVAS_HEIGHT;
     document.body.appendChild(canvas);
-    renderingContext = canvas.getContext('2d');
-
-    // flip canvas so that 0, 0 is upper left corner
-    renderingContext.translate(0, canvas.height);
-    renderingContext.scale(1, -1);
+    graphics.init(canvas);
 
     document.body.appendChild(debugConsole);
 
