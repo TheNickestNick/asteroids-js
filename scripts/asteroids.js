@@ -1,5 +1,5 @@
-define(['./config', './graphics', './meshes'], 
-    function(config, graphics, meshes) {
+define(['./config', './graphics', './meshes', './input'], 
+    function(config, graphics, meshes, input) {
   var ship = { x: 0, y: 0, rot: 0, thrust: false, dx: 0, dy: 0 };
 
   var keys = {};
@@ -54,15 +54,15 @@ define(['./config', './graphics', './meshes'],
   }
 
   function updateSim() {
-    if (keys[config.KEYS.LEFT]) {
+    if (input.keyDown(input.keys.LEFT)) {
       ship.rot -= config.SHIP_ROTATE_SPEED * config.SIM_DELTA_SEC;
     }
     
-    if (keys[config.KEYS.RIGHT]) {
+    if (input.keyDown(input.keys.RIGHT)) {
       ship.rot += config.SHIP_ROTATE_SPEED * config.SIM_DELTA_SEC;
     }
 
-    ship.thrust = keys[config.KEYS.UP];
+    ship.thrust = input.keyDown(input.keys.UP);
     
     if (ship.thrust) {
       ship.dy += Math.cos(ship.rot);
@@ -91,23 +91,7 @@ define(['./config', './graphics', './meshes'],
     renderFrame();
   }
 
-  function debugReplacer(key, val) {
-    return (val && val.toFixed) ? Number(val.toFixed(3)) : val;
-  };
-
-  function getDebugString(delta) {
-    return ['keys: ' + JSON.stringify(keys, debugReplacer),
-        'delta: ' + delta, 
-        'fps: ' + Math.round(1000 / delta),
-        'ship: ' + JSON.stringify(ship, debugReplacer),
-      ].join('<br/>');
-  }
-
-
   (function main() {
-    document.body.addEventListener('keydown', function(event) { keys[event.which] = true; });
-    document.body.addEventListener('keyup', function(event) { keys[event.which] = false; });
-
     var debugConsole = document.createElement('div');
     debugConsole.style.width = '100%';
     debugConsole.style.wordWrap = 'break-word';
@@ -122,11 +106,6 @@ define(['./config', './graphics', './meshes'],
         var delta = time - prevFrameTime;
         update(time, time - prevFrameTime);
         prevFrameTime = time;
-      }
-
-      if (time - prevDebugUpdate > 50) {
-        prevDebugUpdate = time;
-        debugConsole.innerHTML = getDebugString(delta);
       }
 
       window.requestAnimationFrame(mainLoop);
