@@ -53,6 +53,16 @@ define(function() {
       context.restore();
     },
 
+    drawCircle: function(x, y, r, style) {
+      context.save();
+      context.beginPath();
+      context.arc(x, y, r, 0, 2 * Math.PI);
+      context.closePath();
+      context.fillStyle = style;
+      context.fill();
+      context.restore();
+    },
+
     withContext: function(callback) {
       context.save();
       callback(context);

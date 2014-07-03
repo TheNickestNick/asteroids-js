@@ -2,13 +2,9 @@ define(['./config', './graphics', './meshes', './input'],
     function(config, graphics, meshes, input) {
   var ship = { x: 0, y: 0, rot: 0, thrust: false, dx: 0, dy: 0 };
 
-  var keys = {};
-
   var frameTime = null;
 
   var simTime = null;
-
-  var CANVAS_WIDTH = 1000
 
   function updatePosition(entity) {
     entity.x += entity.dx;

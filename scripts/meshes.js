@@ -1,3 +1,4 @@
+// TODO: add support for more than just lineTo in paths.
 define(function() {
   return {
     ship: {
