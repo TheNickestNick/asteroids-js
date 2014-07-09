@@ -1,82 +1,47 @@
-define(['./config', './graphics', './meshes', './input', './simulation'], 
-    function(config, graphics, meshes, input, sim) {
+define(['./config', './graphics', './meshes', './input', './game'], 
+    function(config, graphics, meshes, input, Game) {
 
-  // TODO: we really need a way to separate the model data from the rendering.
-  // I don't like that we have to expose everything via methods on simulation.
-  function drawShip() {
-    graphics.withContext(function(context) {
-      // TODO: figure out a way to abstract these transformations
-      context.translate(sim.ship.x(), sim.ship.y());
-      context.rotate(sim.ship.rot());
-    
-      graphics.drawMesh(meshes.ship);
+  var game = new Game();
 
-      if (sim.ship.thrust()) {
-        graphics.drawMesh(meshes.thrust);
-      }
-    });
-  }
-
-  function drawBullets() {
-    var bullets = sim.bullets();
-    for (var i = 0; i < bullets.length; i++) {
-      graphics.drawCircle(bullets[i].x, bullets[i].y, 2, 'white');
-    }
-  }
-
+  // TODO: replacee this with a streaming command system
   function handleInput() {
     if (input.keyDown(input.keys.LEFT)) {
-      sim.ship.rotate(-config.SHIP_ROTATE_SPEED);
+      game.ship.rotateLeft();
     }
     
     if (input.keyDown(input.keys.RIGHT)) {
-      sim.ship.rotate(config.SHIP_ROTATE_SPEED);
+      game.ship.rotateRight();
     }
 
     if (input.keyDown(input.keys.SPACE)) {
-      sim.ship.shoot();
+      game.shoot();
     }
 
-    sim.ship.thrust(input.keyDown(input.keys.UP));
+    game.ship.thrust(input.keyDown(input.keys.UP));
   }
-
-  function drawFrame() {
-    graphics.clear('black');
-    drawBullets();
-    drawShip();
-  }
-
-  (function main() {
-    var debugConsole = document.createElement('div');
-    debugConsole.style.width = '100%';
-    debugConsole.style.wordWrap = 'break-word';
-
-    window.requestAnimationFrame(function mainLoop(time) {
-      if (!sim.started()) {
-        sim.start(time);
-      }
-
-      handleInput();
-
-      while (sim.time() + sim.SIM_DELTA_MS < time) {
-        sim.step();
-      }
-
-      drawFrame();
-      window.requestAnimationFrame(mainLoop);
-    });
-
-    var canvas = document.createElement('canvas');
-    canvas.width = config.CANVAS_WIDTH;
-    canvas.height = config.CANVAS_HEIGHT;
-    document.body.appendChild(canvas);
-
-    graphics.init(canvas);
-    sim.init(canvas.width, canvas.height);
-  })();
 
   return {
     start: function() {
+      window.requestAnimationFrame(function mainLoop(time) {
+        if (!game.started()) {
+          game.start(time);
+        }
+
+        game.runUntil(time, input);
+        
+        graphics.clear('black');
+        game.draw(graphics);
+
+        window.requestAnimationFrame(mainLoop);
+      });
+
+      var canvas = document.createElement('canvas');
+      canvas.width = config.CANVAS_WIDTH;
+      canvas.height = config.CANVAS_HEIGHT;
+      document.body.appendChild(canvas);
+
+      graphics.init(canvas);
+      sim.init(canvas.width, canvas.height);
     }
   };
 }); // define
