@@ -1,5 +1,5 @@
-define(['./meshes', './wrappable', './utils', './bullet' ], 
-    function(meshes, Wrappable, utils, Bullet) {
+define(['./meshes', './bullet' ], 
+    function(meshes, Wrappable, classes, Bullet) {
   var Ship = function(x, y) {
     this.x = x;
     this.y = y;
@@ -9,7 +9,6 @@ define(['./meshes', './wrappable', './utils', './bullet' ],
     this.thrust = false;
     this.timeUntilShot = 0;
   };
-  utils.mixin(Wrappable, Ship);
 
   Ship.ROTATION_SPEED = 0.05;
   Ship.TIME_BETWEEN_SHOTS = 4;
@@ -29,6 +28,13 @@ define(['./meshes', './wrappable', './utils', './bullet' ],
     this.y += this.vely;
     this.timeUntilShot -= 1;
   }
+
+  Ship.prototype.wrap = function(w, h) {
+    while (this.x > w) { this.x -= w; }
+    while (this.x < 0) { this.x += w; }
+    while (this.y > h) { this.y -= h; }
+    while (this.y < 0) { this.y += h; }
+  };
 
   Ship.prototype.rotateLeft = function() {
     this.rotation -= Ship.ROTATION_SPEED;

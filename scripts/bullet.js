@@ -1,4 +1,4 @@
-define(['./wrappable', './utils'], function(Wrappable, utils) {
+define(function() {
   function Bullet(x, y, velx, vely, direction) {
     this.x = x;
     this.y = y;
@@ -6,7 +6,6 @@ define(['./wrappable', './utils'], function(Wrappable, utils) {
     this.vely = vely + Math.cos(direction) * Bullet.VELOCITY;
     this.ttl = Bullet.TTL;
   };
-  utils.mixin(Wrappable, Bullet);
 
   Bullet.VELOCITY = 10;
   Bullet.TTL = 30; // Frames to live
@@ -20,6 +19,13 @@ define(['./wrappable', './utils'], function(Wrappable, utils) {
     this.x += this.velx;
     this.y += this.vely;
     this.ttl -= 1;
+  };
+
+  Bullet.prototype.wrap = function(w, h) {
+    while (this.x > w) { this.x -= w; }
+    while (this.x < 0) { this.x += w; }
+    while (this.y > h) { this.y -= h; }
+    while (this.y < 0) { this.y += h; }
   };
 
   Bullet.prototype.shouldDie = function() {
