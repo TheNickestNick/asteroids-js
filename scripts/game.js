@@ -10,6 +10,10 @@ define(['./ship'], function(Ship) {
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
 
   Game.prototype.draw = function(graphics) {
+    for (var i = 0; i < this.bullets.length; i++) {
+      this.bullets[i].draw(graphics);
+    }
+
     this.ship.draw(graphics);
   };
 
@@ -48,10 +52,10 @@ define(['./ship'], function(Ship) {
   };
 
   Game.prototype.shoot = function() {
-    var bullet = this.ship.shoot(this.time);
+    var bullet = this.ship.shoot();
     
     if (bullet) {
-      bullets.push(bullet);
+      this.bullets.push(bullet);
     }
   };
 

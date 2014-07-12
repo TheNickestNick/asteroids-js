@@ -1,14 +1,15 @@
 define(['./wrappable', './utils'], function(Wrappable, utils) {
-  function Bullet(x, y, velx, vely) {
+  function Bullet(x, y, velx, vely, direction) {
     this.x = x;
     this.y = y;
-    this.velx = velx;
-    this.vely = vely;
+    this.velx = velx - Math.sin(direction) * Bullet.VELOCITY;
+    this.vely = vely + Math.cos(direction) * Bullet.VELOCITY;
     this.ttl = Bullet.TTL;
   };
   utils.mixin(Wrappable, Bullet);
 
-  Bullet.TTL = 100; // Frames to live
+  Bullet.VELOCITY = 10;
+  Bullet.TTL = 30; // Frames to live
 
   // TODO: find a way to consolidate this with the update in the ship class.
   // Possibilities: 
@@ -17,7 +18,7 @@ define(['./wrappable', './utils'], function(Wrappable, utils) {
   //  mixin that overrides update method
   Bullet.prototype.update = function() {
     this.x += this.velx;
-    this.x += this.vely;
+    this.y += this.vely;
     this.ttl -= 1;
   };
 
@@ -26,7 +27,7 @@ define(['./wrappable', './utils'], function(Wrappable, utils) {
   };
 
   Bullet.prototype.draw = function(graphics) {
-    graphics.drawCircle(this.x, this.y, 3, 'white');
+    graphics.drawCircle(this.x, this.y, 1.5, 'white');
   };
 
   // TODO: make this freelist thing generic
@@ -36,8 +37,9 @@ define(['./wrappable', './utils'], function(Wrappable, utils) {
   Bullet.create = function() {
     if (Bullet.instances.length < Bullet.MAX_INSTANCES) {
       var inst = new Bullet();
+      Bullet.apply(inst, arguments);
       inst.__free = false;
-      instances.push(inst);
+      Bullet.instances.push(inst);
       return inst;
     }
     else {

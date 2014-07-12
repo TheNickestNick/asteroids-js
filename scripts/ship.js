@@ -7,12 +7,13 @@ define(['./meshes', './wrappable', './utils', './bullet' ],
     this.vely = 0;
     this.rotation = 0;
     this.thrust = false;
-    this.lastShot = 0;
+    this.timeUntilShot = 0;
   };
   utils.mixin(Wrappable, Ship);
 
   Ship.ROTATION_SPEED = 0.05;
-  Ship.TIME_BETWEEN_SHOTS = 25;
+  Ship.TIME_BETWEEN_SHOTS = 4;
+  Ship.SHOT_RECOIL = 0.2;
 
   Ship.prototype.engageThrust = function(engaged) {
     this.thrust = engaged;
@@ -26,6 +27,7 @@ define(['./meshes', './wrappable', './utils', './bullet' ],
 
     this.x += this.velx;
     this.y += this.vely;
+    this.timeUntilShot -= 1;
   }
 
   Ship.prototype.rotateLeft = function() {
@@ -36,14 +38,15 @@ define(['./meshes', './wrappable', './utils', './bullet' ],
     this.rotation += Ship.ROTATION_SPEED;
   };
 
-  Ship.prototype.canShoot = function(time) {
-    return this.lastShot + Ship.TIME_BETWEEN_SHOTS < time;
-  };
+  Ship.prototype.shoot = function() {
+    if (this.timeUntilShot <= 0) {
+      this.timeUntilShot = Ship.TIME_BETWEEN_SHOTS;
 
-  Ship.prototype.shoot = function(time, spawner) {
-    if (this.canShoot(time)) {
-      this.lastShot = time;
-      return Bullet.create(this.x, this.y, this.velx, this.vely);
+      // recoil
+      this.velx += Math.sin(this.rotation) * Ship.SHOT_RECOIL;
+      this.vely -= Math.cos(this.rotation) * Ship.SHOT_RECOIL;
+
+      return Bullet.create(this.x, this.y, this.velx, this.vely, this.rotation);
     }
   };
 
