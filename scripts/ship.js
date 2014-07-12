@@ -1,13 +1,14 @@
-define(['./meshes'], function(meshes) {
-  var Ship = function() {
-    this.x = 0;
-    thix.y = 0;
+define(['./meshes', './wrappable', './utils'], function(meshes, Wrappable, utils) {
+  var Ship = function(x, y) {
+    this.x = x;
+    this.y = y;
     this.velx = 0;
     this.vely = 0;
     this.rotation = 0;
     this.thrust = false;
     this.lastShot = 0;
   };
+  utils.mixin(Wrappable, Ship);
 
   Ship.ROTATION_SPEED = 0.05;
   Ship.TIME_BETWEEN_SHOTS = 25;
@@ -27,11 +28,11 @@ define(['./meshes'], function(meshes) {
   }
 
   Ship.prototype.rotateLeft = function() {
-    this.rotation += Ship.ROTATION_SPEED;
+    this.rotation -= Ship.ROTATION_SPEED;
   };
 
   Ship.prototype.rotateRight = function() {
-    this.rotation -= Ship.ROTATION_SPEED;
+    this.rotation += Ship.ROTATION_SPEED;
   };
 
   Ship.prototype.canShoot = function(time) {
@@ -46,14 +47,15 @@ define(['./meshes'], function(meshes) {
   };
 
   Ship.prototype.draw = function(graphics) {
+    var self = this;
     graphics.withContext(function(context) {
       // TODO: figure out a way to abstract these transformations
-      context.translate(this.x, this.y);
-      context.rotate(this.rotation);
+      context.translate(self.x, self.y);
+      context.rotate(self.rotation);
     
       graphics.drawMesh(meshes.ship);
 
-      if (this.thrust) {
+      if (self.thrust) {
         graphics.drawMesh(meshes.thrust);
       }
     });

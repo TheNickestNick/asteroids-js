@@ -1,10 +1,12 @@
 define(['./ship'], function(Ship) {
-  var Game = function() {
-    this.ship = new Ship();
+  var Game = function(width, height) {
+    this.width = width;
+    this.height = height;
+    this.ship = new Ship(width / 2, height / 2);
     this.time = 0;
   };
 
-  Game.STEP_TIME_MS = 50; // 20 fps
+  Game.STEP_TIME_MS = 1000 / 30; // 30 fps
 
   Game.prototype.draw = function(graphics) {
     this.ship.draw(graphics);
@@ -16,6 +18,7 @@ define(['./ship'], function(Ship) {
 
   Game.prototype.step = function() {
     this.ship.update();
+    this.ship.wrap(this.width, this.height);
     this.time += Game.STEP_TIME_MS;
   };
   
@@ -27,6 +30,9 @@ define(['./ship'], function(Ship) {
 
   Game.prototype.started = function() {
     return this.time != 0;
+  };
+
+  Game.prototype.shoot = function() {
   };
 
   return Game;

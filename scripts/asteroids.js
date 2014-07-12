@@ -1,7 +1,7 @@
 define(['./config', './graphics', './meshes', './input', './game'], 
     function(config, graphics, meshes, input, Game) {
 
-  var game = new Game();
+  var game = null;
 
   // TODO: replacee this with a streaming command system
   function handleInput() {
@@ -17,16 +17,25 @@ define(['./config', './graphics', './meshes', './input', './game'],
       game.shoot();
     }
 
-    game.ship.thrust(input.keyDown(input.keys.UP));
+    game.ship.engageThrust(input.keyDown(input.keys.UP));
   }
 
   return {
     start: function() {
+      var canvas = document.createElement('canvas');
+      canvas.width = config.CANVAS_WIDTH;
+      canvas.height = config.CANVAS_HEIGHT;
+      document.body.appendChild(canvas);
+
+      graphics.init(canvas);
+      game = new Game(canvas.width, canvas.height);
+
       window.requestAnimationFrame(function mainLoop(time) {
         if (!game.started()) {
           game.start(time);
         }
 
+        handleInput();
         game.runUntil(time, input);
         
         graphics.clear('black');
@@ -34,14 +43,6 @@ define(['./config', './graphics', './meshes', './input', './game'],
 
         window.requestAnimationFrame(mainLoop);
       });
-
-      var canvas = document.createElement('canvas');
-      canvas.width = config.CANVAS_WIDTH;
-      canvas.height = config.CANVAS_HEIGHT;
-      document.body.appendChild(canvas);
-
-      graphics.init(canvas);
-      sim.init(canvas.width, canvas.height);
     }
   };
 }); // define
