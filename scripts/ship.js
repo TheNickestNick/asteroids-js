@@ -1,4 +1,5 @@
-define(['./meshes', './wrappable', './utils'], function(meshes, Wrappable, utils) {
+define(['./meshes', './wrappable', './utils', './bullet' ], 
+    function(meshes, Wrappable, utils, Bullet) {
   var Ship = function(x, y) {
     this.x = x;
     this.y = y;
@@ -42,7 +43,7 @@ define(['./meshes', './wrappable', './utils'], function(meshes, Wrappable, utils
   Ship.prototype.shoot = function(time, spawner) {
     if (this.canShoot(time)) {
       this.lastShot = time;
-      return spawner.spawnBullet(this.x, this.y, this.vx, this.vy);
+      return Bullet.create(this.x, this.y, this.velx, this.vely);
     }
   };
 

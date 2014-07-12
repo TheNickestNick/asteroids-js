@@ -3,6 +3,7 @@ define(['./ship'], function(Ship) {
     this.width = width;
     this.height = height;
     this.ship = new Ship(width / 2, height / 2);
+    this.bullets = [];
     this.time = 0;
   };
 
@@ -16,9 +17,23 @@ define(['./ship'], function(Ship) {
     this.time = startTime;
   };
 
+  // TODO: can we make the update process more generic?
   Game.prototype.step = function() {
     this.ship.update();
     this.ship.wrap(this.width, this.height);
+
+    for (var i = 0; i < this.bullets.length; i++) {
+      var b = this.bullets[i];
+      b.update();
+      b.wrap(this.width, this.height);
+
+      if (b.shouldDie()) {
+        b.free();
+        this.bullets.splice(i, 1);
+        i--;
+      }
+    }
+
     this.time += Game.STEP_TIME_MS;
   };
   
@@ -33,6 +48,11 @@ define(['./ship'], function(Ship) {
   };
 
   Game.prototype.shoot = function() {
+    var bullet = this.ship.shoot(this.time);
+    
+    if (bullet) {
+      bullets.push(bullet);
+    }
   };
 
   return Game;
