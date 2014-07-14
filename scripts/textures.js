@@ -3,7 +3,10 @@ define(function() {
   // used once textures are loaded. This will entail abstracting away the "fillStyle=pattern"
   // assignment using a method on the graphics class.
   var paths = {
-    rock1: 'assets/rock1.jpg'
+    rock1: 'rock1.jpg',
+    rock2: 'rock2.jpg',
+    rock3: 'rock3.jpg',
+    rock4: 'rock4.jpg'
   };
 
   function loadTexture(context, name, path, callback) {
@@ -26,7 +29,7 @@ define(function() {
   var textures =  {
     load: function(context, callback) {
       for (var name in paths) {
-        loadTexture(context, name, paths[name], function() {
+        loadTexture(context, name, 'assets/' + paths[name], function() {
           toLoad--;
           if (toLoad === 0) {
             callback();

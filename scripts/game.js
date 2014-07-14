@@ -19,9 +19,7 @@ define(['./ship', './asteroid'], function(Ship, Asteroid) {
     this.bullets = [];
     this.time = 0;
 
-    this.asteroids = [
-      new Asteroid(50, 50, 1, 2, 0.075)
-    ];
+    this.asteroids = [];
   };
 
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
@@ -35,6 +33,12 @@ define(['./ship', './asteroid'], function(Ship, Asteroid) {
 
   Game.prototype.start = function(startTime) {
     this.time = startTime;
+
+    for (var i = 0; i < 5; i++) {
+      this.asteroids.push(
+        new Asteroid(Math.random() * this.width, Math.random() * this.height,
+          Math.random(), Math.random()));
+    }
   };
 
   // TODO: can we make the update process more generic?

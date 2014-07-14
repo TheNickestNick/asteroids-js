@@ -72,7 +72,7 @@ define(function() {
     if (typeof defn.update === 'function') {
       constructor.prototype.update = function() {
         Entity.prototype.update.apply(this, arguments);
-        defn.udpate.apply(this, arguments);
+        defn.update.apply(this, arguments);
       };
     }
 
