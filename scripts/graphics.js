@@ -1,11 +1,14 @@
-define(function() {
+define(['./textures'], function() {
   var canvas = null;
   var context = null;
 
   return {
-    init: function(canvas_) {
+    init: function(canvas_, callback) {
       canvas = canvas_;
       context = canvas.getContext('2d');
+
+      // preload all the textures
+      textures.load(context, callback);
 
       // flip canvas so that (0, 0) is upper-left corner.
       context.translate(0, canvas.height);

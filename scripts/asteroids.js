@@ -27,21 +27,25 @@ define(['./config', './graphics', './meshes', './input', './game'],
       canvas.height = config.CANVAS_HEIGHT;
       document.body.appendChild(canvas);
 
-      graphics.init(canvas);
       game = new Game(canvas.width, canvas.height);
+      
+      console.log('Initializing graphics.');
+      graphics.init(canvas, function() {
+        console.log('Starting game.');
 
-      window.requestAnimationFrame(function mainLoop(time) {
-        if (!game.started()) {
-          game.start(time);
-        }
+        window.requestAnimationFrame(function mainLoop(time) {
+          if (!game.started()) {
+            game.start(time);
+          }
 
-        handleInput();
-        game.runUntil(time, input);
-        
-        graphics.clear('black');
-        game.draw(graphics);
+          handleInput();
+          game.runUntil(time, input);
+          
+          graphics.clear('black');
+          game.draw(graphics);
 
-        window.requestAnimationFrame(mainLoop);
+          window.requestAnimationFrame(mainLoop);
+        });
       });
     }
   };
