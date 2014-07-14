@@ -1,18 +1,34 @@
-define(['./ship'], function(Ship) {
+define(['./ship', './asteroid'], function(Ship, Asteroid) {
+  function drawEach(arr, graphics) {
+    for (var i = 0; i < arr.length; i++) {
+      arr[i].draw(graphics);
+    }
+  }
+
+  function updateAndWrapEach(arr, w, h) {
+    for (var i = 0; i < arr.length; i++) {
+      arr[i].update();
+      arr[i].wrap(w, h);
+    }
+  }
+  
   var Game = function(width, height) {
     this.width = width;
     this.height = height;
     this.ship = new Ship(width / 2, height / 2);
     this.bullets = [];
     this.time = 0;
+
+    this.asteroids = [
+      new Asteroid(50, 50, 1, 2)
+    ];
   };
 
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
 
   Game.prototype.draw = function(graphics) {
-    for (var i = 0; i < this.bullets.length; i++) {
-      this.bullets[i].draw(graphics);
-    }
+    drawEach(this.asteroids, graphics);
+    drawEach(this.bullets, graphics);
 
     this.ship.draw(graphics);
   };
@@ -26,10 +42,11 @@ define(['./ship'], function(Ship) {
     this.ship.update();
     this.ship.wrap(this.width, this.height);
 
+    updateAndWrapEach(this.asteroids, this.width, this.height);
+    updateAndWrapEach(this.bullets, this.width, this.height);
+
     for (var i = 0; i < this.bullets.length; i++) {
       var b = this.bullets[i];
-      b.update();
-      b.wrap(this.width, this.height);
 
       if (b.shouldDie()) {
         b.free();

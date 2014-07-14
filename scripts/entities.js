@@ -9,8 +9,9 @@ define(function() {
 
   var entities = {
     define: function() {
-      var behaviors = arguments.slice(0, -1);
-      var def = arguments[arguments.length - 1];
+      var args = Array.prototype.slice.call(arguments);
+      var behaviors = args.slice(0, -1);
+      var def = args[args.length - 1];
 
       // TODO: should behaviors be functions, instead of having an init method?
       var constructor = function() {
