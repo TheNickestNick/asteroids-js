@@ -11,6 +11,10 @@ define(function() {
   }
 
   Entity.prototype.wrap = function(w, h) {
+    while (this.x > w) { this.x -= w; }
+    while (this.x < 0) { this.x += w; }
+    while (this.y > h) { this.y -= h; }
+    while (this.y < 0) { this.y += h; }
   };
 
   Entity.prototype.updatePosition = function() {
@@ -34,6 +38,12 @@ define(function() {
 
   Entity.prototype.die = function() {
     this.dead = true;
+  };
+
+  Entity.prototype.update = function() {
+    this.updatePosition();
+    this.updateRotation();
+    this.updateTTL();
   };
 
   Entity.define = function(defn) {
@@ -68,4 +78,6 @@ define(function() {
 
     return constructor;
   };
+
+  return Entity;
 });

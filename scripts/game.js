@@ -20,7 +20,7 @@ define(['./ship', './asteroid'], function(Ship, Asteroid) {
     this.time = 0;
 
     this.asteroids = [
-      new Asteroid(50, 50, 1, 2)
+      new Asteroid(50, 50, 1, 2, 0.075)
     ];
   };
 

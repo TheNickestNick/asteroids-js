@@ -1,5 +1,5 @@
 define(['./meshes', './bullet' ], 
-    function(meshes, Wrappable, classes, Bullet) {
+    function(meshes, Bullet) {
   var Ship = function(x, y) {
     this.x = x;
     this.y = y;
@@ -13,6 +13,7 @@ define(['./meshes', './bullet' ],
   Ship.ROTATION_SPEED = 0.05;
   Ship.TIME_BETWEEN_SHOTS = 4;
   Ship.SHOT_RECOIL = 0.2;
+  Ship.ACCELERATION = 0.5;
 
   Ship.prototype.engageThrust = function(engaged) {
     this.thrust = engaged;
@@ -20,8 +21,8 @@ define(['./meshes', './bullet' ],
 
   Ship.prototype.update = function() {
     if (this.thrust) {
-      this.velx -= Math.sin(this.rotation);
-      this.vely += Math.cos(this.rotation);
+      this.velx -= Math.sin(this.rotation) * Ship.ACCELERATION;
+      this.vely += Math.cos(this.rotation) * Ship.ACCELERATION;
     }
 
     this.x += this.velx;

@@ -1,6 +1,6 @@
 define(['./entity',], function(Entity) {
   var Asteroid = Entity.define({
-    ctor: function(x, y, velx, velx, velr) {
+    ctor: function(x, y, velx, vely, velr) {
       this.x = x;
       this.y = y;
       this.velx = velx;
@@ -9,7 +9,13 @@ define(['./entity',], function(Entity) {
     },
 
     draw: function(graphics) {
-      graphics.drawCircle(this.x, this.y, 10, 'brown');
+      var self = this;
+      graphics.withContext(function(context) {
+        context.translate(self.x, self.y);
+        context.rotate(self.r);
+        graphics.drawCircle(0, 0, 10, 'brown');
+        graphics.drawCircle(5, 0, 1, 'white')
+      });
     }
   });
 
