@@ -1,4 +1,4 @@
-define(['./textures'], function() {
+define(['./textures'], function(textures) {
   var canvas = null;
   var context = null;
 
