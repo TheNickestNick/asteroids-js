@@ -8,10 +8,6 @@ define(['./collision'], function(collision) {
     this.velr = 0;
     this.ttl = null;
     this.dead = false;
-
-    // TODO: think of a better way to manage bounding volumes
-    this.boundingWidth = 0;
-    this.aabb = new collision.AABB(0, 0, 0, 0);
   }
 
   Entity.prototype.wrap = function(w, h) {
@@ -44,18 +40,10 @@ define(['./collision'], function(collision) {
     this.dead = true;
   };
 
-  Entity.prototype.upateAABB = function() {
-    this.aabb.l = this.x - this.boundingWidth/2;
-    this.aabb.r = this.x + this.boundingWidth/2;
-    this.aabb.t = this.y + this.boundingWidth/2;
-    this.aabb.b = this.y - this.boundingWidth/2;
-  };
-
   Entity.prototype.update = function() {
     this.updatePosition();
     this.updateRotation();
     this.updateTTL();
-    this.upateAABB();
   };
 
   Entity.define = function(defn) {

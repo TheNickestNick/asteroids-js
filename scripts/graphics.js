@@ -56,13 +56,21 @@ define(['./textures'], function(textures) {
       context.restore();
     },
 
-    drawCircle: function(x, y, r, style) {
+    drawCircle: function(x, y, r, style, outline) {
       context.save();
       context.beginPath();
       context.arc(x, y, r, 0, 2 * Math.PI);
       context.closePath();
-      context.fillStyle = style;
-      context.fill();
+      
+      if (outline) {
+        context.strokeStyle = style;
+        context.stroke();
+      }
+      else {
+        context.fillStyle = style;
+        context.fill();
+      }
+
       context.restore();
     },
 

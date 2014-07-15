@@ -15,6 +15,16 @@ define(function() {
         && (between(aabb.t, this.t, this.b) || between(aabb.b, this.t, this.b));
   };
 
+  AABB.prototype.intersectsCircle = function(x, y, radius) {
+    var l = x - radius;
+    var r = x + radius;
+    var t = y + radius;
+    var b = y - radius;
+
+    return (between(l, this.l, this.r) || between(r, this.l, this.r))
+        && (between(t, this.t, this.b) || between(b, this.t, this.b));
+  };
+
   AABB.prototype.draw = function(graphics, style, offset) {
     offset = offset || 0;
     var aabb = this;
@@ -75,8 +85,9 @@ define(function() {
     }
   };
 
+  // TODO: can we just use bounding circles? Circle-box intersection isn't hard...
   Quadtree.prototype.add = function(object) {
-    if (!this.aabb.intersects(object.aabb)) {
+    if (!this.aabb.intersectsCircle(object.x, object.y, object.boundingRadius)) {
       return;
     };
 
@@ -105,7 +116,8 @@ define(function() {
 
     if (this.objects) {
       for (var i = 0; i < this.objects.length; i++) {
-        this.objects[i].aabb.draw(graphics, color);
+        var o = this.objects[i];
+        graphics.drawCircle(o.x, o.y, o.boundingRadius, color, true);
       }
     }
 

@@ -40,7 +40,7 @@ define(['./ship', './asteroid', './collision'], function(Ship, Asteroid, collisi
   Game.prototype.start = function(startTime) {
     this.time = startTime;
 
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 50; i++) {
       this.asteroids.push(
         new Asteroid(Math.random() * this.width, Math.random() * this.height,
           Math.random(), Math.random()));
@@ -72,6 +72,7 @@ define(['./ship', './asteroid', './collision'], function(Ship, Asteroid, collisi
       this.quadtree.add(this.asteroids[i]);
     }
 
+    // TODO: add a way to single-step from the console
     this.time += Game.STEP_TIME_MS;
   };
   
