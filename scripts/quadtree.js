@@ -33,7 +33,6 @@ define(['./geometry'], function(geometry) {
     }
   };
 
-  // TODO: can we just use bounding circles? Circle-box intersection isn't hard...
   Quadtree.prototype.add = function(object) {
     if (!this.aabb.intersectsCircle(object.x, object.y, object.boundingRadius)) {
       return;
@@ -44,6 +43,33 @@ define(['./geometry'], function(geometry) {
     }
     
     this.eachChild(Quadtree.prototype.add, object);
+  };
+
+  Quadtree.prototype.findFirstIsecWithPoint = function(x, y) {
+    if (!this.aabb.containsPoint(x, y)) {
+      return null;
+    }
+  
+    if (this.children) {
+      for (var i = 0; i < this.children.length; i++) {
+        var result = this.children[i].findFirstIsecWithPoint(x, y);
+        if (result) {
+          return result;
+        }
+      }
+    }
+
+    if (this.objects) {
+      for (var i = 0; i < this.objects.length; i++) {
+        var o = this.objects[i];
+        // TODO: should Entity contain bounds checking logic like this?
+        if (geometry.circleContainsPoint(o.x, o.y, o.boundingRadius, x, y)) {
+          return o;
+        }
+      }
+    }
+
+    return null;
   };
 
   // TODO: clean this up by making a debug package

@@ -46,7 +46,6 @@ define(['./ship', './asteroid', './quadtree'], function(Ship, Asteroid, Quadtree
     }
   };
 
-  // TODO: can we make the update process more generic?
   Game.prototype.step = function() {
     this.ship.update();
     this.ship.wrap(this.width, this.height);
@@ -67,9 +66,22 @@ define(['./ship', './asteroid', './quadtree'], function(Ship, Asteroid, Quadtree
     this.quadtree.clear();
     this.quadtree.add(this.ship);
 
+    // TODO: we need a way to track objects and update which leaf they are in,
+    // instead of building a new quadtree each frame.
     for (var i = 0; i < this.asteroids.length; i++) {
       this.quadtree.add(this.asteroids[i]);
     }
+
+
+    for (var i = 0; i < this.bullets.length; i++) {
+      var b = this.bullets[i];
+      var isec = this.quadtree.findFirstIsecWithPoint(b.x, b.y);
+      
+      if (isec && isec.constructor == Asteroid) {
+        console.log('BAM!');
+      }
+    }
+
 
     // TODO: add a way to single-step from the console
     this.time += Game.STEP_TIME_MS;

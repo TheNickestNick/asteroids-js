@@ -10,6 +10,10 @@ define(function() {
     this.b = Math.max(t, b);
   }
 
+  AABB.prototype.containsPoint = function(x, y) {
+    return between(x, this.l, this.r) && between(y, this.t, this.b);
+  };
+
   AABB.prototype.intersects = function(aabb) {
     return (between(aabb.l, this.l, this.r) || between(aabb.r, this.l, this.r))
         && (between(aabb.t, this.t, this.b) || between(aabb.b, this.t, this.b));

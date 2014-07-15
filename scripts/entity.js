@@ -62,6 +62,7 @@ define(function() {
     }
 
     constructor.prototype = new Entity();
+    constructor.prototype.constructor = constructor;
 
     for (var k in defn) {
       if (k !== 'update' && k !== 'ctor') {
