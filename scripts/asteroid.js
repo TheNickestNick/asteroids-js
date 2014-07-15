@@ -16,6 +16,8 @@ define(['./entity','./textures'], function(Entity, textures) {
 
       var ti = parseInt(Math.random() * asteroidTextures.length);
       this.texture = textures[asteroidTextures[ti]];
+
+      this.boundingWidth = 40;
     },
 
     update: function() {

@@ -3,7 +3,6 @@ define(function() {
     return (x >= a && x <= b) || (x >= b && x <= a);
   }
 
-
   function AABB(l, t, r, b) {
     this.l = l;
     this.t = t;
@@ -16,12 +15,13 @@ define(function() {
         && (between(aabb.t, this.t, this.b) || between(aabb.b, this.t, this.b));
   };
 
-  AABB.prototype.draw = function(graphics, style) {
+  AABB.prototype.draw = function(graphics, style, offset) {
+    offset = offset || 0;
     var aabb = this;
     graphics.withContext(function(ctx) {
       ctx.beginPath();
-      ctx.rect(aabb.l, aabb.t, aabb.r - aabb.l, aabb.b - aabb.t);
-      ctx.lineWidth = 2;
+      ctx.rect(aabb.l + offset, aabb.t + offset, aabb.r - aabb.l - 2*offset, aabb.b - aabb.t - 2*offset);
+      ctx.lineWidth = 1;
       ctx.strokeStyle = style || 'white';
       ctx.stroke();
       ctx.closePath();
@@ -93,10 +93,15 @@ define(function() {
     return Quadtree.DEBUG_COLORS[i % 6];
   };
 
-  Quadtree.prototype.draw = function(graphics, counter) {
-    counter = counter || { num: 0 };
-    var color = Quadtree.debugColor(counter.num);
-    this.aabb.draw(graphics, color); 
+  Quadtree.prototype.debugColor = function() {
+    // knuth hash method
+    var colori = ((this.aabb.l + this.aabb.r ^ this.aabb.b + this.aabb.t) * 1677216) % (1 << 24);
+    return '#' + ('000000' + colori.toString(16)).substr(-6, 6);
+  };
+
+  Quadtree.prototype.draw = function(graphics) {
+    var color = this.debugColor();
+    this.aabb.draw(graphics, color, 1); 
 
     if (this.objects) {
       for (var i = 0; i < this.objects.length; i++) {
@@ -104,8 +109,7 @@ define(function() {
       }
     }
 
-    counter.num++;
-    this.eachChild(Quadtree.prototype.draw, graphics, counter);
+    this.eachChild(Quadtree.prototype.draw, graphics);
   };
 
   return {

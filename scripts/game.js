@@ -68,6 +68,10 @@ define(['./ship', './asteroid', './collision'], function(Ship, Asteroid, collisi
     this.quadtree.clear();
     this.quadtree.add(this.ship);
 
+    for (var i = 0; i < this.asteroids.length; i++) {
+      this.quadtree.add(this.asteroids[i]);
+    }
+
     this.time += Game.STEP_TIME_MS;
   };
   
