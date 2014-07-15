@@ -9,10 +9,6 @@ define(['./textures'], function(textures) {
 
       // preload all the textures
       textures.load(context, callback);
-
-      // flip canvas so that (0, 0) is bottom-right corner.
-      context.translate(0, canvas.height);
-      context.scale(1, -1);
     },
 
     clear: function(style) {
@@ -71,6 +67,16 @@ define(['./textures'], function(textures) {
         context.fill();
       }
 
+      context.restore();
+    },
+
+    drawBox: function(l, t, r, b, style) {
+      context.save();
+      context.beginPath();
+      context.rect(l, t, r - l, b - t);
+      context.closePath();
+      context.strokeStyle = style;
+      context.stroke();
       context.restore();
     },
 

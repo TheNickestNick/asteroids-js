@@ -1,4 +1,4 @@
-define(['./collision'], function(collision) {
+define(function() {
   function Entity() {
     this.x = 0;
     this.y = 0;

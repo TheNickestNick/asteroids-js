@@ -1,5 +1,5 @@
-define(['./meshes', './bullet', './collision'], 
-    function(meshes, Bullet, collision) {
+define(['./meshes', './bullet'], 
+    function(meshes, Bullet) {
   var Ship = function(x, y) {
     this.x = x;
     this.y = y;
@@ -40,11 +40,11 @@ define(['./meshes', './bullet', './collision'],
   };
 
   Ship.prototype.rotateLeft = function() {
-    this.rotation -= Ship.ROTATION_SPEED;
+    this.rotation += Ship.ROTATION_SPEED;
   };
 
   Ship.prototype.rotateRight = function() {
-    this.rotation += Ship.ROTATION_SPEED;
+    this.rotation -= Ship.ROTATION_SPEED;
   };
 
   Ship.prototype.shoot = function() {

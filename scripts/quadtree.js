@@ -1,58 +1,6 @@
-define(function() {
-  function between(x, a, b) {
-    return (x >= a && x <= b) || (x >= b && x <= a);
-  }
-
-  function AABB(l, t, r, b) {
-    this.l = l;
-    this.t = t;
-    this.r = r;
-    this.b = b;
-  }
-
-  AABB.prototype.intersects = function(aabb) {
-    return (between(aabb.l, this.l, this.r) || between(aabb.r, this.l, this.r))
-        && (between(aabb.t, this.t, this.b) || between(aabb.b, this.t, this.b));
-  };
-
-  AABB.prototype.intersectsCircle = function(x, y, radius) {
-    var l = x - radius;
-    var r = x + radius;
-    var t = y + radius;
-    var b = y - radius;
-
-    return (between(l, this.l, this.r) || between(r, this.l, this.r))
-        && (between(t, this.t, this.b) || between(b, this.t, this.b));
-  };
-
-  AABB.prototype.draw = function(graphics, style, offset) {
-    offset = offset || 0;
-    var aabb = this;
-    graphics.withContext(function(ctx) {
-      ctx.beginPath();
-      ctx.rect(aabb.l + offset, aabb.t + offset, aabb.r - aabb.l - 2*offset, aabb.b - aabb.t - 2*offset);
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = style || 'white';
-      ctx.stroke();
-      ctx.closePath();
-    });
-  };
-
-  function Circle(cx, cy, r) {
-    this.cx = cx;
-    this.cy = cy;
-    this.r = r;
-  }
-
-  Circle.prototype.intersects = function(circle) {
-    var squaredDistance = (this.cx - circle.cx) * (this.cx - circle.cx)
-        + (this.cy - circle.cy) * (this.cy - circle.cy);
-
-    return squaredDistance < ((this.r + circle.r) * (this.r + circle.r));
-  };
-
+define(['./geometry'], function(geometry) {
   function Quadtree(left, top, w, h, depth) {
-    this.aabb = new AABB(left, top, left + w, top + h);
+    this.aabb = new geometry.AABB(left, top, left + w, top + h);
 
     if (depth == 0) {
       this.objects = [];
@@ -124,9 +72,5 @@ define(function() {
     this.eachChild(Quadtree.prototype.draw, graphics);
   };
 
-  return {
-    AABB: AABB,
-    Circle: Circle,
-    Quadtree: Quadtree
-  };
+  return Quadtree;
 });
