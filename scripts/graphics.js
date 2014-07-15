@@ -10,7 +10,7 @@ define(['./textures'], function(textures) {
       // preload all the textures
       textures.load(context, callback);
 
-      // flip canvas so that (0, 0) is upper-left corner.
+      // flip canvas so that (0, 0) is bottom-right corner.
       context.translate(0, canvas.height);
       context.scale(1, -1);
     },

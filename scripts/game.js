@@ -21,7 +21,7 @@ define(['./ship', './asteroid', './collision'], function(Ship, Asteroid, collisi
 
     this.asteroids = [];
 
-    this.quadtree = new collision.Quadtree(0, 0, width, height, 5);
+    this.quadtree = new collision.Quadtree(0, 0, width, height, 2);
   };
 
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps

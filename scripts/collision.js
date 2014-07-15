@@ -1,5 +1,5 @@
 define(function() {
-  function AABB(l, t, b, r) {
+  function AABB(l, t, r, b) {
     this.l = l;
     this.t = t;
     this.r = r;
@@ -39,10 +39,10 @@ define(function() {
       var childw = w/2;
       var childh = h/2;
       this.children = [
-        new Quadtree(left, top, childw, childw, depth-1),
+        new Quadtree(left, top, childw, childh, depth-1),
         new Quadtree(left+childw, top, childw, childh, depth-1),
         new Quadtree(left, top+childh, childw, childh, depth-1),
-        new Quadtree(left+childw, top+childh, childw, childh, depth+1)
+        new Quadtree(left+childw, top+childh, childw, childh, depth-1)
       ];
     }
   }
@@ -58,34 +58,31 @@ define(function() {
   Quadtree.prototype.eachChild = function(func) {
     if (this.children) {
       for (var i = 0; i < this.children.length; i++) {
-        func.apply(this.children[i]);
+        func.apply(this.children[i], Array.prototype.slice.call(arguments, 1));
       }
     }
   };
 
-  Quadtree.prototype.add = function(o) {
-    
-  };
+  Quadtree.DEBUG_COLORS = ['red', 'green', 'blue', 'purple', 'orange'];
 
-  Quadtree.prototype.remove = function() {
-  }
-
-  Quadtree.prototype.findIntersections = function() {
-  }
-
-  Quadtree.prototype.draw = function(graphics) {
+  Quadtree.prototype.draw = function(graphics, depth) {
+    var depth = depth || 0;
     var aabb = this.aabb;
     graphics.withContext(function(ctx) {
+      ctx.beginPath();
       ctx.rect(aabb.l, aabb.t, aabb.r - aabb.l, aabb.b - aabb.t);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = Quadtree.DEBUG_COLORS[depth];
       ctx.stroke();
+      ctx.closePath();
     });
 
-    this.eachChild(Quadtree.prototype.draw);
+   this.eachChild(Quadtree.prototype.draw, graphics, depth+1);
   };
 
   return {
     AABB: AABB,
-    Sphere: Sphere,
+    Circle: Circle,
     Quadtree: Quadtree
   };
 });
