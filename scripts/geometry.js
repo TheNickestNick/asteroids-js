@@ -18,20 +18,22 @@ define(function() {
   AABB.prototype.intersectsCircle = function(cx, cy, cr) {
     // Make a new aabb that is the original extended by the radius on all sides
     var l = this.l - cr;
-    var t = this.t + cr;
+    var t = this.t - cr;
     var r = this.r + cr;
-    var b = this.b - cr;
+    var b = this.b + cr;
 
     // Check whether the center of the circle is in the enlarged box.
-    if (!between(cx, l, r) || !between(cy, b, t)) {
+    if (!between(cx, l, r) || !between(cy, t, b)) {
       return false;
     }
-  
+
     // Check the four corner cases.
-    return (cx < l && cy > t && Circle.containsPoint(cx, cy, cr, l, t))
-        || (cx > r && cy > t && Circle.containsPoint(cx, cy, cr, r, t))
-        || (cx < l && cy < b && Circle.contiansPoint(cx, cy, cr, l, b))
-        || (cx > r && cy < b && Circle.containsPoint(cx, cy, cr, r, b));
+    if (cx < l && cy > t) return Circle.containsPoint(cx, cy, cr, l, t);
+    if (cx > r && cy > t) return Circle.containsPoint(cx, cy, cr, r, t);
+    if (cx < l && cy < b) return Circle.contiansPoint(cx, cy, cr, l, b);
+    if (cx > r && cy < b) return Circle.containsPoint(cx, cy, cr, r, b);
+
+    return true;
   };
 
   AABB.prototype.draw = function(graphics, style, offset) {
