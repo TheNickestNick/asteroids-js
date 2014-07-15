@@ -27,20 +27,19 @@ define(['./ship', './asteroid', './quadtree'], function(Ship, Asteroid, Quadtree
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
 
   Game.prototype.draw = function(graphics) {
-    drawEach(this.asteroids, graphics);
-    drawEach(this.bullets, graphics);
-
-    this.ship.draw(graphics);
-
     if (window.debug_draw_quadtree) {
       this.quadtree.draw(graphics);
     }
+
+    drawEach(this.asteroids, graphics);
+    drawEach(this.bullets, graphics);
+    this.ship.draw(graphics);
   };
 
   Game.prototype.start = function(startTime) {
     this.time = startTime;
 
-    for (var i = 0; i < 50; i++) {
+    for (var i = 0; i < 10; i++) {
       this.asteroids.push(
         new Asteroid(Math.random() * this.width, Math.random() * this.height,
           Math.random(), Math.random()));

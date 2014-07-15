@@ -70,12 +70,20 @@ define(['./textures'], function(textures) {
       context.restore();
     },
 
-    drawBox: function(l, t, r, b, style) {
+    fillBox: function(l, t, r, b, style) {
+      context.save();
+      context.fillStyle = style;
+      context.fillRect(l, t, r - l, b - t);
+      context.restore();
+    },
+
+    outlineBox: function(l, t, r, b, style) {
       context.save();
       context.beginPath();
       context.rect(l, t, r - l, b - t);
       context.closePath();
       context.strokeStyle = style;
+      context.lineWidth = 2;
       context.stroke();
       context.restore();
     },

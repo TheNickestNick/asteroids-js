@@ -28,37 +28,23 @@ define(function() {
     }
 
     // Check the four corner cases.
-    if (cx < l && cy > t) return Circle.containsPoint(cx, cy, cr, l, t);
-    if (cx > r && cy > t) return Circle.containsPoint(cx, cy, cr, r, t);
-    if (cx < l && cy < b) return Circle.contiansPoint(cx, cy, cr, l, b);
-    if (cx > r && cy < b) return Circle.containsPoint(cx, cy, cr, r, b);
+    if (cx < l && cy > t) return cirlceContainsPoint(cx, cy, cr, l, t);
+    if (cx > r && cy > t) return circleContainsPoint(cx, cy, cr, r, t);
+    if (cx < l && cy < b) return circleContiansPoint(cx, cy, cr, l, b);
+    if (cx > r && cy < b) return circleContainsPoint(cx, cy, cr, r, b);
 
     return true;
   };
 
-  AABB.prototype.draw = function(graphics, style, offset) {
-    offset = offset || 0;
-    graphics.drawBox(this.l + offset, 
-                     this.t + offset, 
-                     this.r - 2*offset, 
-                     this.b - 2*offset, style);
-  };
-
-  function Circle(x, c, r) {
-    this.x = x;
-    this.y = y;
-    this.r = r;
-  }
-
-  Circle.prototype.intersects = function(circle) {
-    var dx = circle.x - this.x;
-    var dy = circle.y - this.y;
+  function circlesIntersect(x1, y1, r1, x2, x2, r2) {
+    var dx = x1 - x2;
+    var dy = y1 - y2;
     var d2 = dx*dx + dy*dy;
-    var rsum = circle.r + this.r;
+    var rsum = r1 + r2;
     return d2 < (rsum * rsum);
   };
 
-  Circle.containsPoint = function(cx, cy, cr, px, py) {
+  function circleContainsPoint(cx, cy, cr, px, py) {
     var dx = px - cx;
     var dy = py - cy;
     var d2 = dx*dx + dy*dy;
@@ -67,6 +53,7 @@ define(function() {
 
   return {
     AABB: AABB,
-    Circle: Circle
+    circleContainsPoint: circleContainsPoint,
+    circlesIntersect: circlesIntersect
   };
 });

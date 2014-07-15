@@ -60,7 +60,13 @@ define(['./geometry'], function(geometry) {
 
   Quadtree.prototype.draw = function(graphics) {
     var color = this.debugColor();
-    this.aabb.draw(graphics, color, 1); 
+    var offset = 0;
+    graphics.fillBox(this.aabb.l + offset, 
+                     this.aabb.t + offset, 
+                     this.aabb.r - 2*offset, 
+                     this.aabb.b - 2*offset, color);
+
+    this.eachChild(Quadtree.prototype.draw, graphics);
 
     if (this.objects) {
       for (var i = 0; i < this.objects.length; i++) {
@@ -68,8 +74,6 @@ define(['./geometry'], function(geometry) {
         graphics.drawCircle(o.x, o.y, o.boundingRadius, color, true);
       }
     }
-
-    this.eachChild(Quadtree.prototype.draw, graphics);
   };
 
   return Quadtree;
