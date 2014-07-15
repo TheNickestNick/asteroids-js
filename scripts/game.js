@@ -32,7 +32,9 @@ define(['./ship', './asteroid', './collision'], function(Ship, Asteroid, collisi
 
     this.ship.draw(graphics);
 
-    this.quadtree.draw(graphics);
+    if (window.debug_draw_quadtree) {
+      this.quadtree.draw(graphics);
+    }
   };
 
   Game.prototype.start = function(startTime) {
@@ -62,6 +64,9 @@ define(['./ship', './asteroid', './collision'], function(Ship, Asteroid, collisi
         i--;
       }
     }
+
+    this.quadtree.clear();
+    this.quadtree.add(this.ship);
 
     this.time += Game.STEP_TIME_MS;
   };

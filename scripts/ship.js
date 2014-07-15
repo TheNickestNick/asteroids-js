@@ -1,5 +1,5 @@
-define(['./meshes', './bullet' ], 
-    function(meshes, Bullet) {
+define(['./meshes', './bullet', './collision'], 
+    function(meshes, Bullet, collision) {
   var Ship = function(x, y) {
     this.x = x;
     this.y = y;
@@ -8,6 +8,8 @@ define(['./meshes', './bullet' ],
     this.rotation = 0;
     this.thrust = false;
     this.timeUntilShot = 0;
+
+    this.aabb = new collision.AABB(-10, -10, 10, 10);
   };
 
   Ship.ROTATION_SPEED = 0.05;
@@ -28,6 +30,12 @@ define(['./meshes', './bullet' ],
     this.x += this.velx;
     this.y += this.vely;
     this.timeUntilShot -= 1;
+
+
+    this.aabb.l = this.x - 10;
+    this.aabb.r = this.x + 10;
+    this.aabb.t = this.y - 10;
+    this.aabb.b = this.y + 10;
   }
 
   Ship.prototype.wrap = function(w, h) {

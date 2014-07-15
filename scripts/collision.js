@@ -1,4 +1,9 @@
 define(function() {
+  function between(x, a, b) {
+    return (x >= a && x <= b) || (x >= b && x <= a);
+  }
+
+
   function AABB(l, t, r, b) {
     this.l = l;
     this.t = t;
@@ -7,13 +12,20 @@ define(function() {
   }
 
   AABB.prototype.intersects = function(aabb) {
-    var overlapsHorizontally = aabb.l >= this.l && aabb.l <= this.r
-                            || aabb.r >= this.l && aabb.r <= this.r;
+    return (between(aabb.l, this.l, this.r) || between(aabb.r, this.l, this.r))
+        && (between(aabb.t, this.t, this.b) || between(aabb.b, this.t, this.b));
+  };
 
-    var overlapsVertically = aabb.t >= this.b && aabb.t <= this.t
-                          || aabb.b >= this.b && aabb.b <= this.t;
-
-    return overlapsHorizaontally && overlapsVeritcally;
+  AABB.prototype.draw = function(graphics, style) {
+    var aabb = this;
+    graphics.withContext(function(ctx) {
+      ctx.beginPath();
+      ctx.rect(aabb.l, aabb.t, aabb.r - aabb.l, aabb.b - aabb.t);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = style || 'white';
+      ctx.stroke();
+      ctx.closePath();
+    });
   };
 
   function Circle(cx, cy, r) {
@@ -63,21 +75,37 @@ define(function() {
     }
   };
 
-  Quadtree.DEBUG_COLORS = ['red', 'green', 'blue', 'purple', 'orange'];
+  Quadtree.prototype.add = function(object) {
+    if (!this.aabb.intersects(object.aabb)) {
+      return;
+    };
 
-  Quadtree.prototype.draw = function(graphics, depth) {
-    var depth = depth || 0;
-    var aabb = this.aabb;
-    graphics.withContext(function(ctx) {
-      ctx.beginPath();
-      ctx.rect(aabb.l, aabb.t, aabb.r - aabb.l, aabb.b - aabb.t);
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = Quadtree.DEBUG_COLORS[depth];
-      ctx.stroke();
-      ctx.closePath();
-    });
+    if (this.objects) {
+      this.objects.push(object);
+    }
+    
+    this.eachChild(Quadtree.prototype.add, object);
+  };
 
-   this.eachChild(Quadtree.prototype.draw, graphics, depth+1);
+  // TODO: clean this up by making a debug package
+  Quadtree.DEBUG_COLORS = ['red', 'green', 'blue', 'purple', 'orange', 'brown'];
+  Quadtree.debugColor = function(i) {
+    return Quadtree.DEBUG_COLORS[i % 6];
+  };
+
+  Quadtree.prototype.draw = function(graphics, counter) {
+    counter = counter || { num: 0 };
+    var color = Quadtree.debugColor(counter.num);
+    this.aabb.draw(graphics, color); 
+
+    if (this.objects) {
+      for (var i = 0; i < this.objects.length; i++) {
+        this.objects[i].aabb.draw(graphics, color);
+      }
+    }
+
+    counter.num++;
+    this.eachChild(Quadtree.prototype.draw, graphics, counter);
   };
 
   return {
