@@ -1,4 +1,4 @@
-define(['./ship', './asteroid'], function(Ship, Asteroid) {
+define(['./ship', './asteroid', './collision'], function(Ship, Asteroid, collision) {
   function drawEach(arr, graphics) {
     for (var i = 0; i < arr.length; i++) {
       arr[i].draw(graphics);
@@ -20,6 +20,8 @@ define(['./ship', './asteroid'], function(Ship, Asteroid) {
     this.time = 0;
 
     this.asteroids = [];
+
+    this.quadtree = new collision.Quadtree(0, 0, width, height, 5);
   };
 
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
@@ -29,6 +31,8 @@ define(['./ship', './asteroid'], function(Ship, Asteroid) {
     drawEach(this.bullets, graphics);
 
     this.ship.draw(graphics);
+
+    this.quadtree.draw(graphics);
   };
 
   Game.prototype.start = function(startTime) {
