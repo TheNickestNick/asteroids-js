@@ -2,7 +2,7 @@ define(['./entity','./textures'], function(Entity, textures) {
   var asteroidTextures = ['rock1', 'rock2', 'rock3', 'rock4'];
 
   var Asteroid = Entity.define({
-    ctor: function(x, y, velx, vely) {
+    ctor: function(x, y, velx, vely, size) {
       this.x = x;
       this.y = y;
       this.velx = velx;
@@ -17,7 +17,10 @@ define(['./entity','./textures'], function(Entity, textures) {
       var ti = parseInt(Math.random() * asteroidTextures.length);
       this.texture = textures[asteroidTextures[ti]];
 
-      this.boundingRadius = 20;
+      this.size = size || 4;
+
+      // TODO: maybe make this a method?
+      this.boundingRadius = this.size * 7;
     },
 
     update: function() {
@@ -32,7 +35,7 @@ define(['./entity','./textures'], function(Entity, textures) {
         context.rotate(self.r);
 
         context.translate(self.u, self.v);
-        graphics.drawCircle(-self.u, -self.v, 20, self.texture);
+        graphics.drawCircle(-self.u, -self.v, self.boundingRadius, self.texture);
       });
     }
   });

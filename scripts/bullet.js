@@ -8,7 +8,7 @@ define(function() {
   };
 
   Bullet.VELOCITY = 10;
-  Bullet.TTL = 30; // Frames to live
+  Bullet.TTL = 40; // Frames to live
 
   // TODO: find a way to consolidate this with the update in the ship class.
   // Possibilities: 
@@ -38,7 +38,7 @@ define(function() {
 
   // TODO: make this freelist thing generic
   Bullet.instances = [];
-  Bullet.MAX_INSTANCES = 30;
+  Bullet.MAX_INSTANCES = 100;
 
   Bullet.create = function() {
     if (Bullet.instances.length < Bullet.MAX_INSTANCES) {

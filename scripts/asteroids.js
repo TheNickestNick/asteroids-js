@@ -23,8 +23,9 @@ define(['./config', './graphics', './meshes', './input', './game'],
   return {
     start: function() {
       var canvas = document.createElement('canvas');
-      canvas.width = config.CANVAS_WIDTH;
-      canvas.height = config.CANVAS_HEIGHT;
+      canvas.width = 1000; //config.CANVAS_WIDTH;
+      canvas.height = canvas.width * (9/16); //config.CANVAS_HEIGHT;
+      canvas.style.width = '100%';
       document.body.appendChild(canvas);
 
       game = new Game(canvas.width, canvas.height);

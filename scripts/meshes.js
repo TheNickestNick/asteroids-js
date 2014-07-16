@@ -5,6 +5,7 @@ define(function() {
       type: 'fill',
       style: 'red',
       translate: [0, -7],
+      scale: 1.4,
       path: [[0, 22], [-10, 0], [10, 0]]
     },
 

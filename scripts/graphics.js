@@ -18,7 +18,10 @@ define(['./textures'], function(textures) {
       context.restore();
     },
 
-    drawMesh: function(mesh) {
+    // TODO: fix this API, it's pretty hacky
+    // I'd really like to have:
+    // - drawMesh(mesh, transform, material)
+    drawMesh: function(mesh, fillStyle) {
       context.save();
     
       if (mesh.translate && mesh.translate.length > 1) {
@@ -26,7 +29,10 @@ define(['./textures'], function(textures) {
       }
 
       if (mesh.scale && mesh.scale.length > 1) {
-        context.scale.apply(context, mesh.scale);
+        context.scale(mesh.scale[0], mesh.scale[1]);
+      }
+      else if (typeof mesh.scale === 'number') {
+        context.scale(mesh.scale, mesh.scale);
       }
 
       context.beginPath();
@@ -42,7 +48,7 @@ define(['./textures'], function(textures) {
       context.closePath();
 
       if (mesh.type == 'fill') {
-        context.fillStyle = mesh.style;
+        context.fillStyle = fillStyle || mesh.style;
         context.fill();
       } else {
         context.strokeStyle = 'white';
@@ -95,6 +101,10 @@ define(['./textures'], function(textures) {
     },
 
     width: function() { return canvas.width; },
-    height: function() { return canvas.height; }
+    height: function() { return canvas.height; },
+
+    context: function() {
+      return context;
+    }
   };
 });

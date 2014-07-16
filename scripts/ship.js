@@ -13,8 +13,8 @@ define(['./meshes', './bullet'],
   };
 
   Ship.ROTATION_SPEED = 0.05;
-  Ship.TIME_BETWEEN_SHOTS = 4;
-  Ship.SHOT_RECOIL = 0.2;
+  Ship.TIME_BETWEEN_SHOTS = 2;
+  Ship.SHOT_RECOIL = 0.1;
   Ship.ACCELERATION = 0.5;
 
   Ship.prototype.engageThrust = function(engaged) {
@@ -51,11 +51,14 @@ define(['./meshes', './bullet'],
     if (this.timeUntilShot <= 0) {
       this.timeUntilShot = Ship.TIME_BETWEEN_SHOTS;
 
-      // recoil
-      this.velx += Math.sin(this.rotation) * Ship.SHOT_RECOIL;
-      this.vely -= Math.cos(this.rotation) * Ship.SHOT_RECOIL;
+      var spread = 0.1;
+      var bdir = this.rotation + (Math.random()*spread - (spread/2));
+      var bullet = Bullet.create(this.x, this.y, this.velx, this.vely, bdir);
 
-      return Bullet.create(this.x, this.y, this.velx, this.vely, this.rotation);
+      // recoil
+      this.velx += Math.sin(bdir) * Ship.SHOT_RECOIL;
+      this.vely -= Math.cos(bdir) * Ship.SHOT_RECOIL;
+      return bullet;
     }
   };
 
