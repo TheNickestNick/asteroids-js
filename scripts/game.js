@@ -1,5 +1,5 @@
-define(['./ship', './asteroid', './quadtree', './meshes', './array'], 
-    function(Ship, Asteroid, Quadtree, meshes, array) {
+define(['./ship', './asteroid', './quadtree', './meshes', './array', './explosion'], 
+    function(Ship, Asteroid, Quadtree, meshes, array, Explosion) {
   function drawEach(arr, graphics) {
     for (var i = 0; i < arr.length; i++) {
       arr[i].draw(graphics);
@@ -15,6 +15,7 @@ define(['./ship', './asteroid', './quadtree', './meshes', './array'],
     this.points = 0;
     this.lives = 2;
 
+    this.fx = [];
     this.asteroids = [];
 
     this.quadtree = new Quadtree(0, 0, width, height, 3);
@@ -69,6 +70,7 @@ define(['./ship', './asteroid', './quadtree', './meshes', './array'],
 
     this.stepEach(this.asteroids);
     this.stepEach(this.bullets);
+    this.stepEach(this.fx);
 
     this.quadtree.rebuild(this.asteroids);
 
