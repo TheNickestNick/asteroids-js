@@ -60,7 +60,7 @@ define(['./ship', './asteroid', './quadtree', './meshes'], function(Ship, Astero
     for (var i = 0; i < this.bullets.length; i++) {
       var b = this.bullets[i];
 
-      if (b.shouldDie()) {
+      if (b.isDead()) {
         b.free();
         this.bullets.splice(i, 1);
         i--;
@@ -75,7 +75,6 @@ define(['./ship', './asteroid', './quadtree', './meshes'], function(Ship, Astero
     for (var i = 0; i < this.asteroids.length; i++) {
       this.quadtree.add(this.asteroids[i]);
     }
-
 
     for (var i = 0; i < this.bullets.length; i++) {
       var b = this.bullets[i];
@@ -97,12 +96,11 @@ define(['./ship', './asteroid', './quadtree', './meshes'], function(Ship, Astero
     }
 
     for (var i = 0; i < this.asteroids.length; i++) {
-      if (this.asteroids[i].dead) {
+      if (this.asteroids[i].isDead()) {
         this.asteroids.splice(i, 1);
         i--;
       }
     }
-
 
     // TODO: add a way to single-step from the console
     this.time += Game.STEP_TIME_MS;

@@ -1,36 +1,16 @@
-define(function() {
-  function Bullet(x, y, velx, vely, direction) {
-    this.x = x;
-    this.y = y;
-    this.velx = velx - Math.sin(direction) * Bullet.VELOCITY;
-    this.vely = vely + Math.cos(direction) * Bullet.VELOCITY;
-    this.ttl = Bullet.TTL;
-  };
+define(['./entity'], function(Entity) {
+  Bullet = Entity.define({
+    ctor: function(x, y, velx, vely, direction) {
+      this.x = x;
+      this.y = y;
+      this.velx = velx - Math.sin(direction) * Bullet.VELOCITY;
+      this.vely = vely + Math.cos(direction) * Bullet.VELOCITY;
+      this.ttl = Bullet.TTL;
+    }
+  });
 
   Bullet.VELOCITY = 10;
-  Bullet.TTL = 40; // Frames to live
-
-  // TODO: find a way to consolidate this with the update in the ship class.
-  // Possibilities: 
-  //  base class with extends-like semantics (and override)
-  //  mixin with "updatePosition" method or "move" method
-  //  mixin that overrides update method
-  Bullet.prototype.update = function() {
-    this.x += this.velx;
-    this.y += this.vely;
-    this.ttl -= 1;
-  };
-
-  Bullet.prototype.wrap = function(w, h) {
-    while (this.x > w) { this.x -= w; }
-    while (this.x < 0) { this.x += w; }
-    while (this.y > h) { this.y -= h; }
-    while (this.y < 0) { this.y += h; }
-  };
-
-  Bullet.prototype.shouldDie = function() {
-    return this.ttl <= 0;
-  };
+  Bullet.TTL = 50; // Frames to live
 
   Bullet.prototype.draw = function(graphics) {
     graphics.drawCircle(this.x, this.y, 1.5, 'white');

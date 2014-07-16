@@ -26,13 +26,16 @@ define(function() {
     this.r += this.velr;
   };
 
-  Entity.prototype.isAlive = function() {
-    return this.ttl === 0 || this.dead;
-  };
-
   Entity.prototype.updateTTL = function() {
-    if (this.ttl) {
-      this.ttl -= 1;
+    if (this.ttl === null) {
+      return;
+    }
+
+    if (this.ttl === 0) {
+      this.die();
+    }
+    else {
+      this.ttl--;
     }
   };
 
@@ -44,6 +47,10 @@ define(function() {
     this.updatePosition();
     this.updateRotation();
     this.updateTTL();
+  };
+
+  Entity.prototype.isDead = function() {
+    return this.dead;
   };
 
   Entity.define = function(defn) {

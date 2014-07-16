@@ -14,7 +14,7 @@ define(['./meshes', './bullet'],
 
   Ship.ROTATION_SPEED = 0.05;
   Ship.TIME_BETWEEN_SHOTS = 2;
-  Ship.SHOT_RECOIL = 0.1;
+  Ship.SHOT_RECOIL = 0.03;
   Ship.ACCELERATION = 0.5;
 
   Ship.prototype.engageThrust = function(engaged) {
