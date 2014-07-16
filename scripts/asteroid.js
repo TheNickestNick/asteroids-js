@@ -2,7 +2,7 @@ define(['./entity','./textures'], function(Entity, textures) {
   var asteroidTextures = ['rock1', 'rock2', 'rock3', 'rock4'];
 
   var Asteroid = Entity.define({
-    ctor: function(x, y, velx, vely, size) {
+    init: function(x, y, velx, vely, size) {
       this.x = x;
       this.y = y;
       this.velx = velx;
@@ -21,6 +21,7 @@ define(['./entity','./textures'], function(Entity, textures) {
 
       // TODO: maybe make this a method?
       this.boundingRadius = this.size * 7;
+      return this;
     },
 
     update: function() {

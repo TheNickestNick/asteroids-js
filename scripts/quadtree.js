@@ -1,4 +1,6 @@
 define(['./geometry'], function(geometry) {
+  // TODO: maybe keep leaves in a big array, so they can be cleared really easily? This
+  // might also make it easier to update the tree rather than rebuilding it.
   function Quadtree(left, top, w, h, depth) {
     this.aabb = new geometry.AABB(left, top, left + w, top + h);
 
@@ -16,6 +18,13 @@ define(['./geometry'], function(geometry) {
       ];
     }
   }
+
+  Quadtree.prototype.rebuild = function(objects) {
+    this.clear();
+    for (var i = 0; i < objects.length; i++) {
+      this.add(objects[i]);
+    }
+  };
 
   Quadtree.prototype.clear = function() {
     if (this.objects) {

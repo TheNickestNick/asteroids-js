@@ -1,14 +1,8 @@
-define(['./ship', './asteroid', './quadtree', './meshes'], function(Ship, Asteroid, Quadtree, meshes) {
+define(['./ship', './asteroid', './quadtree', './meshes', './array'], 
+    function(Ship, Asteroid, Quadtree, meshes, array) {
   function drawEach(arr, graphics) {
     for (var i = 0; i < arr.length; i++) {
       arr[i].draw(graphics);
-    }
-  }
-
-  function updateAndWrapEach(arr, w, h) {
-    for (var i = 0; i < arr.length; i++) {
-      arr[i].update();
-      arr[i].wrap(w, h);
     }
   }
   
@@ -45,36 +39,38 @@ define(['./ship', './asteroid', './quadtree', './meshes'], function(Ship, Astero
 
     for (var i = 0; i < 10; i++) {
       this.asteroids.push(
-        new Asteroid(Math.random() * this.width, Math.random() * this.height,
+        Asteroid.create().init(Math.random() * this.width, Math.random() * this.height,
           Math.random(), Math.random()));
     }
   };
 
+  Game.prototype.stepEach = function(arr) {
+    for (var i = 0; i < arr.length; i++) {
+      var ent = arr[i];
+      ent.update();
+      ent.wrap(this.width, this.height);
+
+      if (ent.isDead()) {
+        array.remove(arr, i);
+        i--;
+
+        // TODO: hack, remove
+        if (typeof ent.free == 'function') {
+          ent.free();
+        }
+      }
+    }
+  };
+
+  // TODO: audit the order of these updates.
   Game.prototype.step = function() {
     this.ship.update();
     this.ship.wrap(this.width, this.height);
 
-    updateAndWrapEach(this.asteroids, this.width, this.height);
-    updateAndWrapEach(this.bullets, this.width, this.height);
+    this.stepEach(this.asteroids);
+    this.stepEach(this.bullets);
 
-    for (var i = 0; i < this.bullets.length; i++) {
-      var b = this.bullets[i];
-
-      if (b.isDead()) {
-        b.free();
-        this.bullets.splice(i, 1);
-        i--;
-      }
-    }
-
-    this.quadtree.clear();
-    this.quadtree.add(this.ship);
-
-    // TODO: we need a way to track objects and update which leaf they are in,
-    // instead of building a new quadtree each frame.
-    for (var i = 0; i < this.asteroids.length; i++) {
-      this.quadtree.add(this.asteroids[i]);
-    }
+    this.quadtree.rebuild(this.asteroids);
 
     for (var i = 0; i < this.bullets.length; i++) {
       var b = this.bullets[i];
@@ -83,22 +79,17 @@ define(['./ship', './asteroid', './quadtree', './meshes'], function(Ship, Astero
       if (hit && hit.constructor == Asteroid) {
         hit.die();
         b.free();
-        this.bullets.splice(i, 1);
+        array.remove(this.bullets, i);
         i--;
 
-        this.points += 100;
+        this.points += 10 * hit.size;
         // TODO: move this into the asteroid class so that we can have different behaviors.
         if (hit.size > 1) {
-          this.asteroids.push(new Asteroid(hit.x, hit.y, Math.random(), Math.random(), hit.size-1));
-          this.asteroids.push(new Asteroid(hit.x, hit.y, Math.random(), Math.random(), hit.size-1));
+          this.asteroids.push(
+              Asteroid.create().init(hit.x, hit.y, Math.random(), Math.random(), hit.size-1));
+          this.asteroids.push(
+              Asteroid.create().init(hit.x, hit.y, Math.random(), Math.random(), hit.size-1));
         }
-      }
-    }
-
-    for (var i = 0; i < this.asteroids.length; i++) {
-      if (this.asteroids[i].isDead()) {
-        this.asteroids.splice(i, 1);
-        i--;
       }
     }
 

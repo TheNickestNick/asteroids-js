@@ -53,7 +53,7 @@ define(['./meshes', './bullet'],
 
       var spread = 0.1;
       var bdir = this.rotation + (Math.random()*spread - (spread/2));
-      var bullet = Bullet.create(this.x, this.y, this.velx, this.vely, bdir);
+      var bullet = Bullet.create().init(this.x, this.y, this.velx, this.vely, bdir);
 
       // recoil
       this.velx += Math.sin(bdir) * Ship.SHOT_RECOIL;
