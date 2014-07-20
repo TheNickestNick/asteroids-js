@@ -1,5 +1,7 @@
-define(['./config', './graphics', './meshes', './input', './game'], 
-    function(config, graphics, meshes, input, Game) {
+define(['./config', './graphics', './meshes', './input', './game', './debug'], 
+    function(config, graphics, meshes, input, Game, debug) {
+
+  debug.define('skip_frames', 0);
 
   var game = null;
 
@@ -20,6 +22,31 @@ define(['./config', './graphics', './meshes', './input', './game'],
     game.ship.engageThrust(input.keyDown(input.keys.UP));
   }
 
+  var skipCounter = 0;
+  function mainLoop(time) {
+    window.requestAnimationFrame(mainLoop);
+
+    if (debug.vars.skip_frames) {
+      if (skipCounter > 0) {
+        skipCounter--;
+        return;
+      }
+      else {
+        skipCounter = debug.vars.skip_frames;
+      }
+    }
+
+    if (!game.started()) {
+      game.start(time);
+    }
+
+    handleInput();
+    game.runUntil(time, input);
+    
+    graphics.clear('black');
+    game.draw(graphics);
+  }
+
   return {
     start: function() {
       var canvas = document.createElement('canvas');
@@ -33,20 +60,7 @@ define(['./config', './graphics', './meshes', './input', './game'],
       console.log('Initializing graphics.');
       graphics.init(canvas, function() {
         console.log('Starting game.');
-
-        window.requestAnimationFrame(function mainLoop(time) {
-          if (!game.started()) {
-            game.start(time);
-          }
-
-          handleInput();
-          game.runUntil(time, input);
-          
-          graphics.clear('black');
-          game.draw(graphics);
-
-          window.requestAnimationFrame(mainLoop);
-        });
+        window.requestAnimationFrame(mainLoop);
       });
     }
   };

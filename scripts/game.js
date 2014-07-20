@@ -1,5 +1,7 @@
-define(['./ship', './asteroid', './quadtree', './meshes', './array', './explosion'], 
-    function(Ship, Asteroid, Quadtree, meshes, array, Explosion) {
+define(['./ship', './asteroid', './quadtree', './meshes', './array', './explosion', './debug'], 
+    function(Ship, Asteroid, Quadtree, meshes, array, Explosion, debug) {
+  debug.define('pause', false);
+
   function drawEach(arr, graphics) {
     for (var i = 0; i < arr.length; i++) {
       arr[i].draw(graphics);
@@ -30,6 +32,7 @@ define(['./ship', './asteroid', './quadtree', './meshes', './array', './explosio
 
     drawEach(this.asteroids, graphics);
     drawEach(this.bullets, graphics);
+    drawEach(this.fx, graphics);
     this.ship.draw(graphics);
 
     this.drawHud(graphics);
@@ -92,16 +95,21 @@ define(['./ship', './asteroid', './quadtree', './meshes', './array', './explosio
           this.asteroids.push(
               Asteroid.create().init(hit.x, hit.y, Math.random(), Math.random(), hit.size-1));
         }
+
+        this.fx.push(Explosion.create().init(hit.x, hit.y));
+        this.fx.push(Explosion.create().init(b.x, b.y));
       }
     }
-
-    // TODO: add a way to single-step from the console
-    this.time += Game.STEP_TIME_MS;
   };
   
   Game.prototype.runUntil = function(time) {
     while (this.time + Game.STEP_TIME_MS < time) {
-      this.step();
+      if (!debug.vars.pause) {
+        this.step();
+      }
+
+      // TODO: add a way to single-step from the console
+      this.time += Game.STEP_TIME_MS;
     }
   };
 
