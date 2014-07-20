@@ -10,6 +10,7 @@ define(['./meshes', './entity'],
       this.shooting = false;
       this.timeUntilShot = 0;
       this.boundingRadius = 10;
+      this.timeUntilNotInvincible = Ship.INVINCIBILITY_TIME;
       return this;
     },
 
@@ -21,19 +22,13 @@ define(['./meshes', './entity'],
 
       if (this.shooting && this.timeUntilShot <= 0) {
         this.timeUntilShot = Ship.TIME_BETWEEN_SHOTS;
-
-        var spread = 0.1;
-        var bdir = this.r + (Math.random()*spread - (spread/2));
-        this.spawner.spawnBullet(this.x, this.y, this.velx, this.vely, bdir);
-
-        // recoil
-        this.velx += Math.sin(bdir) * Ship.SHOT_RECOIL;
-        this.vely -= Math.cos(bdir) * Ship.SHOT_RECOIL;
+        this.fire(0);
+        this.fire(0.1);
+        this.fire(-0.1);
       }
 
-      this.x += this.velx;
-      this.y += this.vely;
       this.timeUntilShot -= 1;
+      this.timeUntilNotInvincible -= 1;
     },
 
     thrust: function(thrusting) {
@@ -48,6 +43,21 @@ define(['./meshes', './entity'],
       this.velr = direction * Ship.ROTATION_SPEED;
     },
 
+    invincible: function() {
+      return this.timeUntilNotInvincible > 0;
+    },
+
+    fire: function(dirOffset) {
+      dirOffset = dirOffset || 0;
+      var spread = 0.1;
+      var bdir = this.r + dirOffset + (Math.random()*spread - (spread/2));
+      this.spawner.spawnBullet(this.x, this.y, this.velx, this.vely, bdir);
+
+      // recoil
+      this.velx += Math.sin(bdir) * Ship.SHOT_RECOIL;
+      this.vely -= Math.cos(bdir) * Ship.SHOT_RECOIL;
+    },
+
     draw: function(graphics) {
       var self = this;
       graphics.withContext(function(context) {
@@ -55,7 +65,12 @@ define(['./meshes', './entity'],
         context.translate(self.x, self.y);
         context.rotate(self.r);
       
-        graphics.drawMesh(meshes.ship);
+        var fillStyle = null;
+        if (self.invincible()) {
+          fillStyle = self.timeUntilNotInvincible % 2 == 0 ? 'black' : null;
+        }
+
+        graphics.drawMesh(meshes.ship, fillStyle);
 
         if (self.thrusting) {
           graphics.drawMesh(meshes.thrust);
@@ -64,6 +79,7 @@ define(['./meshes', './entity'],
     }
   });
 
+  Ship.INVINCIBILITY_TIME = 50;
   Ship.ROTATION_SPEED = 0.1;
   Ship.TIME_BETWEEN_SHOTS = 2;
   Ship.SHOT_RECOIL = 0.03;

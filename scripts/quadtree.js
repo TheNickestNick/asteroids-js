@@ -62,7 +62,7 @@ define(['./geometry'], function(geometry) {
     if (this.children) {
       for (var i = 0; i < this.children.length; i++) {
         var result = this.children[i].findFirstIsecWithPoint(x, y);
-        if (result) {
+        if (result && !result.isDead()) {
           return result;
         }
       }
