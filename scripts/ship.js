@@ -1,30 +1,60 @@
 define(['./meshes', './bullet'], 
     function(meshes, Bullet) {
-  var Ship = function(x, y) {
+  var Ship = function(spawner, x, y) {
     this.x = x;
     this.y = y;
     this.velx = 0;
     this.vely = 0;
     this.rotation = 0;
-    this.thrust = false;
+    this.turning = 0;
+    this.thrusting = false;
+    this.shooting = false;
     this.timeUntilShot = 0;
+    this.spawner = spawner;
 
     this.boundingRadius = 10;
   };
 
-  Ship.ROTATION_SPEED = 0.05;
+  Ship.ROTATION_SPEED = 0.1;
   Ship.TIME_BETWEEN_SHOTS = 2;
   Ship.SHOT_RECOIL = 0.03;
   Ship.ACCELERATION = 0.5;
 
-  Ship.prototype.engageThrust = function(engaged) {
-    this.thrust = engaged;
+  Ship.prototype.thrust = function(thrusting) {
+    this.thrusting = thrusting;
+  };
+
+  Ship.prototype.shoot = function(shooting) {
+    this.shooting = shooting;
+  };
+
+  Ship.prototype.turn = function(direction) {
+    this.turning = direction;
   };
 
   Ship.prototype.update = function() {
-    if (this.thrust) {
+    if (this.thrusting) {
       this.velx -= Math.sin(this.rotation) * Ship.ACCELERATION;
       this.vely += Math.cos(this.rotation) * Ship.ACCELERATION;
+    }
+
+    if (this.turning > 0) {
+      this.rotation += Ship.ROTATION_SPEED;
+    }
+    else if (this.turning < 0) {
+      this.rotation -= Ship.ROTATION_SPEED;
+    }
+
+    if (this.shooting && this.timeUntilShot <= 0) {
+      this.timeUntilShot = Ship.TIME_BETWEEN_SHOTS;
+
+      var spread = 0.1;
+      var bdir = this.rotation + (Math.random()*spread - (spread/2));
+      this.spawner.spawnBullet(this.x, this.y, this.velx, this.vely, bdir);
+
+      // recoil
+      this.velx += Math.sin(bdir) * Ship.SHOT_RECOIL;
+      this.vely -= Math.cos(bdir) * Ship.SHOT_RECOIL;
     }
 
     this.x += this.velx;
@@ -39,29 +69,6 @@ define(['./meshes', './bullet'],
     while (this.y < 0) { this.y += h; }
   };
 
-  Ship.prototype.rotateLeft = function() {
-    this.rotation += Ship.ROTATION_SPEED;
-  };
-
-  Ship.prototype.rotateRight = function() {
-    this.rotation -= Ship.ROTATION_SPEED;
-  };
-
-  Ship.prototype.shoot = function() {
-    if (this.timeUntilShot <= 0) {
-      this.timeUntilShot = Ship.TIME_BETWEEN_SHOTS;
-
-      var spread = 0.1;
-      var bdir = this.rotation + (Math.random()*spread - (spread/2));
-      var bullet = Bullet.create().init(this.x, this.y, this.velx, this.vely, bdir);
-
-      // recoil
-      this.velx += Math.sin(bdir) * Ship.SHOT_RECOIL;
-      this.vely -= Math.cos(bdir) * Ship.SHOT_RECOIL;
-      return bullet;
-    }
-  };
-
   Ship.prototype.draw = function(graphics) {
     var self = this;
     graphics.withContext(function(context) {
@@ -71,7 +78,7 @@ define(['./meshes', './bullet'],
     
       graphics.drawMesh(meshes.ship);
 
-      if (self.thrust) {
+      if (self.thrusting) {
         graphics.drawMesh(meshes.thrust);
       }
     });

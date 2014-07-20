@@ -11,7 +11,7 @@ define(['./ship', './asteroid', './quadtree', './meshes', './array', './explosio
   var Game = function(width, height) {
     this.width = width;
     this.height = height;
-    this.ship = new Ship(width / 2, height / 2);
+    this.ship = new Ship(this, width / 2, height / 2);
     this.bullets = [];
     this.time = 0;
     this.points = 0;
@@ -117,14 +117,6 @@ define(['./ship', './asteroid', './quadtree', './meshes', './array', './explosio
     return this.time != 0;
   };
 
-  Game.prototype.shoot = function() {
-    var bullet = this.ship.shoot();
-    
-    if (bullet) {
-      this.bullets.push(bullet);
-    }
-  };
-
   Game.prototype.drawHud = function(graphics) {
     var ctx = graphics.context();
     ctx.save();
@@ -146,6 +138,10 @@ define(['./ship', './asteroid', './quadtree', './meshes', './array', './explosio
     var textSize = ctx.measureText(this.points);
     ctx.fillText(this.points, this.width - textSize.width - 8, 58);
     ctx.restore();
+  };
+
+  Game.prototype.spawnBullet = function(x, y, velx, vely, dir) {
+    this.bullets.push(Bullet.create().init(x, y, velx, vely, dir));
   };
 
   return Game;

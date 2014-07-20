@@ -4,27 +4,13 @@ define(['./config', './graphics', './meshes', './input', './game', './debug'],
   debug.define('skip_frames', 0);
 
   var game = null;
-
-  // TODO: replacee this with a streaming command system
-  function handleInput() {
-    if (input.keyDown(input.keys.LEFT)) {
-      game.ship.rotateLeft();
-    }
-    
-    if (input.keyDown(input.keys.RIGHT)) {
-      game.ship.rotateRight();
-    }
-
-    if (input.keyDown(input.keys.SPACE)) {
-      game.shoot();
-    }
-
-    game.ship.engageThrust(input.keyDown(input.keys.UP));
-  }
-
   var skipCounter = 0;
   function mainLoop(time) {
     window.requestAnimationFrame(mainLoop);
+
+    if (debug.vars.pause) {
+      return;
+    }
 
     if (debug.vars.skip_frames) {
       if (skipCounter > 0) {
@@ -40,7 +26,6 @@ define(['./config', './graphics', './meshes', './input', './game', './debug'],
       game.start(time);
     }
 
-    handleInput();
     game.runUntil(time, input);
     
     graphics.clear('black');
@@ -57,6 +42,9 @@ define(['./config', './graphics', './meshes', './input', './game', './debug'],
 
       game = new Game(canvas.width, canvas.height);
       
+      console.log('Initializing input.');
+      input.init(game);
+
       console.log('Initializing graphics.');
       graphics.init(canvas, function() {
         console.log('Starting game.');
