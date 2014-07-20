@@ -1,5 +1,7 @@
-define(['./ship', './asteroid', './quadtree', './meshes', './array', './explosion', './debug'], 
-    function(Ship, Asteroid, Quadtree, meshes, array, Explosion, debug) {
+define(
+    ['./ship', './asteroid', './quadtree', './meshes', './array', './explosion', './debug', 
+     './bullet'], 
+    function(Ship, Asteroid, Quadtree, meshes, array, Explosion, debug, Bullet) {
   debug.define('pause', false);
 
   function drawEach(arr, graphics) {
@@ -11,7 +13,7 @@ define(['./ship', './asteroid', './quadtree', './meshes', './array', './explosio
   var Game = function(width, height) {
     this.width = width;
     this.height = height;
-    this.ship = new Ship(this, width / 2, height / 2);
+    this.ship = Ship.create(this).init(width / 2, height / 2);
     this.bullets = [];
     this.time = 0;
     this.points = 0;

@@ -1,5 +1,5 @@
 define(['./pooled'], function(pooled) {
-  function Entity() {
+  function Entity(spawner) {
     this.x = 0;
     this.y = 0;
     this.r = 0;
@@ -8,6 +8,7 @@ define(['./pooled'], function(pooled) {
     this.velr = 0;
     this.ttl = null;
     this.dead = false;
+    this.spawner = spawner;
   }
 
   Entity.prototype.wrap = function(w, h) {
@@ -55,14 +56,14 @@ define(['./pooled'], function(pooled) {
     var constructor;
 
     if (typeof defn.ctor === 'function') {
-      constructor = function() {
-        Entity.call(this);
+      constructor = function(arg) {
+        Entity.call(this, arg);
         defn.ctor.call(this);
       };
     }
     else {
-      constructor = function() {
-        Entity.call(this);
+      constructor = function(arg) {
+        Entity.call(this, arg);
       }
     }
 

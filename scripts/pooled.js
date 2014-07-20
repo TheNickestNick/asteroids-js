@@ -6,7 +6,7 @@ define(function() {
       ctor.freeList_ = [];
       ctor.instanceCount_ = 0;
 
-      ctor.create = function() {
+      ctor.create = function(arg) {
         if (ctor.instanceCount_ >= ctor.MAX_INSTANCE_COUNT) {
           throw new Error('Tried to create too many instances.'); 
         }
@@ -17,10 +17,10 @@ define(function() {
           // constructor. The teardown would be called each time an entity is
           // released. This might help find/prevent bugs due to references to
           // freed objects.
-          ctor.call(instance);
+          ctor.call(instance, arg);
         }
         else {
-          var instance = new ctor();
+          var instance = new ctor(arg);
         }
 
         ctor.instanceCount_++;
