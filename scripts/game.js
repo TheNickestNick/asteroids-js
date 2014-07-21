@@ -6,12 +6,14 @@ define(
   debug.define('pause_step', 0);
   debug.define('draw_quadtree', false);
 
+  // TODO: we need the concept of a Player at some point.
   var Game = function(width, height) {
     this.width = width;
     this.height = height;
     this.time = 0;
     this.points = 0;
     this.lives = 2;
+    this.xp = 0;
 
     this.ship = null;
     this.bullets = [];
@@ -90,6 +92,7 @@ define(
         hit.die();
         b.die();
         this.points += 10 * hit.size;
+        this.xp += 10;
         this.fx.push(Explosion.create().init(hit.x, hit.y, 5));
         this.fx.push(Explosion.create().init(b.x, b.y, 5));
       }

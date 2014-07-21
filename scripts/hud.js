@@ -23,6 +23,21 @@ define(['./meshes'], function(meshes) {
       ctx.fillText(game.points, game.width - textSize.width - 8, 58);
       ctx.restore();
 
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(10, 10, 300, 15);
+      ctx.closePath();
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.rect(12, 12, game.xp, 11);
+      ctx.closePath();
+      ctx.fillStyle = 'green';
+      ctx.fill();
+      ctx.restore();
+
       if (game.over()) {
         ctx.save();
         ctx.fillStyle = 'red';
