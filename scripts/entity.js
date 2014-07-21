@@ -52,6 +52,8 @@ define(['./pooled', './debug'], function(pooled, debug) {
 
   // TODO: should we do this with all of the other overrides?
   Entity.prototype.onDie = abstract;
+  Entity.prototype.onUpdate = abstract;
+  Entity.prototype.onDraw = abstract;
 
   Entity.prototype.update = function() {
     this.updatePosition();
@@ -67,6 +69,8 @@ define(['./pooled', './debug'], function(pooled, debug) {
     if (debug.vars.draw_bounds) {
       gfx.outlineCircle(this.x, this.y, this.boundingRadius, 'orange', 2);
     }
+
+    this.onDraw(gfx);
   };
 
   Entity.define = function(defn) {
@@ -98,13 +102,6 @@ define(['./pooled', './debug'], function(pooled, debug) {
       constructor.prototype.update = function() {
         Entity.prototype.update.call(this);
         defn.update.call(this);
-      };
-    }
-
-    if (typeof defn.draw === 'function') {
-      constructor.prototype.draw = function(gfx) {
-        Entity.prototype.draw.call(this, gfx);
-        defn.draw.call(this, gfx);
       };
     }
 

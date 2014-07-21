@@ -55,26 +55,6 @@ define(['./meshes', './entity'],
       this.velx += Math.sin(bdir) * Ship.SHOT_RECOIL;
       this.vely -= Math.cos(bdir) * Ship.SHOT_RECOIL;
     },
-
-    draw: function(graphics) {
-      var self = this;
-      graphics.withContext(function(context) {
-        // TODO: figure out a way to abstract these transformations
-        context.translate(self.x, self.y);
-        context.rotate(self.r);
-      
-        var fillStyle = null;
-        if (self.invincible()) {
-          fillStyle = self.timeUntilNotInvincible % 2 == 0 ? 'black' : null;
-        }
-
-        graphics.drawMesh(meshes.ship, fillStyle);
-
-        if (self.thrusting) {
-          graphics.drawMesh(meshes.thrust);
-        }
-      });
-    }
   });
 
   Ship.INVINCIBILITY_TIME = 80;
@@ -82,5 +62,26 @@ define(['./meshes', './entity'],
   Ship.TIME_BETWEEN_SHOTS = 8;
   Ship.SHOT_RECOIL = 0.06;
   Ship.ACCELERATION = 0.35;
+  
+  Ship.prototype.onDraw = function(graphics) {
+    var self = this;
+    graphics.withContext(function(context) {
+      // TODO: figure out a way to abstract these transformations
+      context.translate(self.x, self.y);
+      context.rotate(self.r);
+    
+      var fillStyle = null;
+      if (self.invincible()) {
+        fillStyle = self.timeUntilNotInvincible % 2 == 0 ? 'black' : null;
+      }
+
+      graphics.drawMesh(meshes.ship, fillStyle);
+
+      if (self.thrusting) {
+        graphics.drawMesh(meshes.thrust);
+      }
+    });
+  };
+  
   return Ship;
 });

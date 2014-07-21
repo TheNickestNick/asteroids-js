@@ -7,15 +7,16 @@ define(['./entity'], function(Entity) {
       this.vely = vely + Math.cos(direction) * Bullet.VELOCITY;
       this.ttl = Bullet.TTL;
       return this;
-    },
-    
-    draw: function(graphics) {
-      graphics.drawCircle(this.x, this.y, 1.5, 'white');
     }
   });
 
   Bullet.VELOCITY = 10;
   Bullet.TTL = 50; // Frames to live
+
+  Bullet.prototype.onDraw = function(graphics) {
+    graphics.drawCircle(this.x, this.y, 1.5, 'white');
+  };
+
   return Bullet;
 });
 

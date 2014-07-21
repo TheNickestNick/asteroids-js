@@ -40,19 +40,19 @@ define(['./entity','./textures', './utils'], function(Entity, textures, utils) {
       this.spawner.spawnAsteroid(
           Asteroid.create().init(
               this.x, this.y, utils.random(-1, 1), utils.random(-1, 1), this.size - 1)); 
-    },
-
-    draw: function(graphics) {
-      var self = this;
-      graphics.withContext(function(context) {
-        context.translate(self.x, self.y);
-        context.rotate(self.r);
-
-        context.translate(self.u, self.v);
-        graphics.drawCircle(-self.u, -self.v, self.boundingRadius, self.texture);
-      });
     }
   });
+
+  Asteroid.prototype.onDraw = function(graphics) {
+    var self = this;
+    graphics.withContext(function(context) {
+      context.translate(self.x, self.y);
+      context.rotate(self.r);
+
+      context.translate(self.u, self.v);
+      graphics.drawCircle(-self.u, -self.v, self.boundingRadius, self.texture);
+    });
+  };
 
   return Asteroid;
 });
