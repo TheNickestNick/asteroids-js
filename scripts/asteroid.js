@@ -24,24 +24,24 @@ define(['./entity','./textures', './utils'], function(Entity, textures, utils) {
       return this;
     },
 
-    update: function() {
-      this.u += this.velu;
-      this.v += this.velv;
-    },
-
-    onDie: function() {
-      if (this.size > 1) {
-        this.spawnChild();
-        this.spawnChild();
-      }
-    },
-
     spawnChild: function() {
       this.spawner.spawnAsteroid(
           Asteroid.create().init(
               this.x, this.y, utils.random(-1, 1), utils.random(-1, 1), this.size - 1)); 
     }
   });
+
+  Asteroid.prototype.onUpdate = function() {
+    this.u += this.velu;
+    this.v += this.velv;
+  };
+
+  Asteroid.prototype.onDie = function() {
+    if (this.size > 1) {
+      this.spawnChild();
+      this.spawnChild();
+    }
+  };
 
   Asteroid.prototype.onDraw = function(graphics) {
     var self = this;

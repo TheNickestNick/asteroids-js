@@ -14,21 +14,6 @@ define(['./meshes', './entity'],
       return this;
     },
 
-    update: function() {
-      if (this.thrusting) {
-        this.velx -= Math.sin(this.r) * Ship.ACCELERATION;
-        this.vely += Math.cos(this.r) * Ship.ACCELERATION;
-      }
-
-      if (this.shooting && this.timeUntilShot <= 0) {
-        this.timeUntilShot = Ship.TIME_BETWEEN_SHOTS;
-        this.fire(0);
-      }
-
-      this.timeUntilShot -= 1;
-      this.timeUntilNotInvincible -= 1;
-    },
-
     thrust: function(thrusting) {
       this.thrusting = thrusting;
     },
@@ -62,6 +47,21 @@ define(['./meshes', './entity'],
   Ship.TIME_BETWEEN_SHOTS = 8;
   Ship.SHOT_RECOIL = 0.06;
   Ship.ACCELERATION = 0.35;
+
+  Ship.prototype.onUpdate = function() {
+    if (this.thrusting) {
+      this.velx -= Math.sin(this.r) * Ship.ACCELERATION;
+      this.vely += Math.cos(this.r) * Ship.ACCELERATION;
+    }
+
+    if (this.shooting && this.timeUntilShot <= 0) {
+      this.timeUntilShot = Ship.TIME_BETWEEN_SHOTS;
+      this.fire(0);
+    }
+
+    this.timeUntilShot -= 1;
+    this.timeUntilNotInvincible -= 1;
+  };
   
   Ship.prototype.onDraw = function(graphics) {
     var self = this;

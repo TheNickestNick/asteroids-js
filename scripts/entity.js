@@ -18,20 +18,15 @@ define(['./pooled', './debug'], function(pooled, debug) {
     this.spawner = spawner;
   }
 
+  Entity.prototype.onDie = abstract;
+  Entity.prototype.onUpdate = abstract;
+  Entity.prototype.onDraw = abstract;
+
   Entity.prototype.wrap = function(w, h) {
     while (this.x > w) { this.x -= w; }
     while (this.x < 0) { this.x += w; }
     while (this.y > h) { this.y -= h; }
     while (this.y < 0) { this.y += h; }
-  };
-
-  Entity.prototype.updatePosition = function() {
-    this.x += this.velx;
-    this.y += this.vely;
-  };
-
-  Entity.prototype.updateRotation = function() {
-    this.r += this.velr;
   };
 
   Entity.prototype.updateTTL = function() {
@@ -50,15 +45,12 @@ define(['./pooled', './debug'], function(pooled, debug) {
     this.onDie();
   };
 
-  // TODO: should we do this with all of the other overrides?
-  Entity.prototype.onDie = abstract;
-  Entity.prototype.onUpdate = abstract;
-  Entity.prototype.onDraw = abstract;
-
   Entity.prototype.update = function() {
-    this.updatePosition();
-    this.updateRotation();
+    this.x += this.velx;
+    this.y += this.vely;
+    this.r += this.velr;
     this.updateTTL();
+    this.onUpdate();
   };
 
   Entity.prototype.isAlive = function() {
