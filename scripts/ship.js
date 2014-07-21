@@ -61,24 +61,21 @@ define(['./meshes', './entity'], function(meshes, Entity) {
     this.timeUntilNotInvincible -= 1;
   };
   
-  Ship.prototype.onDraw = function(graphics) {
-    var self = this;
-    graphics.withContext(function(context) {
-      // TODO: figure out a way to abstract these transformations
-      context.translate(self.x, self.y);
-      context.rotate(self.r);
-    
-      var fillStyle = null;
-      if (self.invincible()) {
-        fillStyle = self.timeUntilNotInvincible % 2 == 0 ? 'black' : null;
-      }
+  Ship.prototype.onDraw = function(ctx) {
+    // TODO: figure out a way to abstract these transformations
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.r);
+  
+    var fillStyle = null;
+    if (this.invincible()) {
+      fillStyle = this.timeUntilNotInvincible % 2 == 0 ? 'black' : null;
+    }
 
-      meshes.ship.draw(context, fillStyle);
+    meshes.ship.draw(ctx, fillStyle);
 
-      if (self.thrusting) {
-        meshes.thrust.draw(context);
-      }
-    });
+    if (this.thrusting) {
+      meshes.thrust.draw(ctx);
+    }
   };
   
   return Ship;

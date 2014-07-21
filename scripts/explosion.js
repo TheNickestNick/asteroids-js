@@ -1,7 +1,7 @@
 // TODO: add generic/static wrap and updatePosition methods to Entity, so that code doesn't live here?
 // TODO: should we add a generic particle system, instead of having distinct entities for each type
 // of particle animation we want to do?
-define(['./entity', './array'], function(Entity, array) {
+define(['./entity', './array', './gfx'], function(Entity, array, gfx) {
   var COLORS = ['red', 'orange', 'yellow', 'white'];
   //COLORS = ['white'];
 
@@ -37,11 +37,13 @@ define(['./entity', './array'], function(Entity, array) {
     return this;
   };
 
-  Explosion.prototype.onDraw = function(graphics) {
+  Explosion.prototype.onDraw = function(ctx) {
     for (var i = 0; i < this.particleCount; i++) {
       var p = this.particles[i];
       if (p.ttl > 0) {
-        graphics.drawCircle(this.x + p.x, this.y + p.y, 1.5, p.color);
+        gfx.circle(ctx, this.x + p.x, this.y + p.y, 1.5);
+        ctx.fillStyle = p.color;
+        ctx.fill();
       }
     }
   };

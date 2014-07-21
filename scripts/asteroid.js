@@ -1,4 +1,4 @@
-define(['./entity','./textures', './utils'], function(Entity, textures, utils) {
+define(['./entity','./textures', './utils', './gfx'], function(Entity, textures, utils, gfx) {
   var asteroidTextures = ['rock1', 'rock2', 'rock3', 'rock4'];
   var Asteroid = Entity.subclass();
 
@@ -36,15 +36,14 @@ define(['./entity','./textures', './utils'], function(Entity, textures, utils) {
     }
   };
 
-  Asteroid.prototype.onDraw = function(graphics) {
-    var self = this;
-    graphics.withContext(function(context) {
-      context.translate(self.x, self.y);
-      context.rotate(self.r);
+  Asteroid.prototype.onDraw = function(ctx) {
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.r);
 
-      context.translate(self.u, self.v);
-      graphics.drawCircle(-self.u, -self.v, self.boundingRadius, self.texture);
-    });
+    ctx.translate(this.u, this.v);
+    gfx.circle(ctx, -this.u, -this.v, this.boundingRadius);
+    ctx.fillStyle = this.texture;
+    ctx.fill();
   };
 
   Asteroid.prototype.spawnChild = function() {

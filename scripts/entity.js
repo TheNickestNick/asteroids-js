@@ -64,7 +64,10 @@ define(['./pooled', './debug'], function(pooled, debug) {
       gfx.outlineCircle(this.x, this.y, this.boundingRadius, 'orange', 2);
     }
 
-    this.onDraw(gfx);
+    var ctx = gfx.context();
+    ctx.save();
+    this.onDraw(ctx);
+    ctx.restore();
   };
 
   Entity.subclass = function(ctor) {
