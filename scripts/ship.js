@@ -1,4 +1,4 @@
-define(['./meshes', './entity'], function(meshes, Entity) {
+define(['./meshes', './entity', './audio'], function(meshes, Entity, audio) {
   var Ship = Entity.subclass();
 
   Ship.prototype.init = function(x, y) {
@@ -105,6 +105,8 @@ define(['./meshes', './entity'], function(meshes, Entity) {
         this.fire(-0.1);
         this.fire(0.1);
       }
+
+      audio.play(audio.sounds.shoot2);
     }
 
     this.timeUntilShot -= 1;

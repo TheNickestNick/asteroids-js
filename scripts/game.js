@@ -1,7 +1,8 @@
 define(
     ['./ship', './asteroid', './quadtree', './meshes', './array', './explosion', './debug', 
-     './bullet', './hud', './bonus'], 
-    function(Ship, Asteroid, Quadtree, meshes, array, Explosion, debug, Bullet, hud, Bonus) {
+     './bullet', './hud', './bonus', './audio', './missile'], 
+    function(Ship, Asteroid, Quadtree, meshes, array, Explosion, debug, Bullet, hud, Bonus, 
+             audio, Missile) {
   debug.define('pause', false);
   debug.define('pause_step', 0);
   debug.define('draw_quadtree', false);
@@ -21,8 +22,9 @@ define(
     this.fx = [];
     this.asteroids = [];
     this.bonuses = [];
+    this.missiles = [];
     // TODO: somehow make ship part of this
-    this.entities = [this.bullets, this.asteroids, this.fx, this.bonuses];
+    this.entities = [this.bullets, this.missiles, this.asteroids, this.fx, this.bonuses];
 
     this.respawnIn = null;
     this.quadtree = new Quadtree(0, 0, width, height, 3);
@@ -35,6 +37,8 @@ define(
   Game.prototype.start = function(startTime) {
     this.time = startTime;
     this.startLevel();
+
+    this.missiles.push(Missile.create(this).init(200, 200, 0, 0, 0));
   };
 
   Game.prototype.stepAndWrap = function(ent) {
@@ -81,7 +85,7 @@ define(
       this.ship = Ship.create(this).init(this.width / 2, this.height / 2);
     }
     else {
-      this.ship.setPosition(this.width/2, this.height/2);
+      this.ship.respawn(this.width/2, this.height/2);
     }
 
     for (var i = 0; i < this.level; i++) {
@@ -156,6 +160,7 @@ define(
         this.ship.die();
         this.ship.free();
         this.ship = null;
+        audio.play(audio.sounds.crash);
 
         if (this.lives > 0) {
           this.respawnIn = Game.SHIP_RESPAWN_TIME;
@@ -164,6 +169,7 @@ define(
       else if (hit.constructor == Bonus) {
         hit.applyTo(this.ship, this);
         hit.die();
+        audio.play(audio.sounds.bonus2);
       }
     }
   };

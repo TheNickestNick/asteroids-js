@@ -14,8 +14,7 @@ define(['./entity', './gfx', './utils', './array'], function(Entity, gfx, utils,
         console.log('Bonus: Decrease cannon reload time.');
       }
     }, {
-      color: 'blue',
-      apply: function(ship) {
+      color: 'blue', apply: function(ship) {
         ship.decreaseRecoil();
         console.log('Bonus: Decrease cannon recoil.');
       },

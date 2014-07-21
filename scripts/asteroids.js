@@ -1,5 +1,5 @@
-define(['./config', './graphics', './meshes', './input', './game', './debug'], 
-    function(config, graphics, meshes, input, Game, debug) {
+define(['./config', './graphics', './meshes', './input', './game', './debug', './audio'], 
+    function(config, graphics, meshes, input, Game, debug, audio) {
 
   debug.define('skip_frames', 0);
 
@@ -44,10 +44,16 @@ define(['./config', './graphics', './meshes', './input', './game', './debug'],
       console.log('Initializing input.');
       input.init(game);
 
+      // TODO: make these inits happen concurrently
       console.log('Initializing graphics.');
       graphics.init(canvas, function() {
-        console.log('Starting game.');
-        window.requestAnimationFrame(mainLoop);
+        console.log('Graphics: Initialized');
+        console.log('Audio: Initializing');
+        audio.init(function() {
+          console.log('Audio: Initialized');
+          console.log('Starting game.');
+          window.requestAnimationFrame(mainLoop);
+        });
       });
     }
   };
