@@ -29,20 +29,6 @@ define(
 
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
 
-  Game.prototype.draw = function(graphics) {
-    if (debug.vars.draw_quadtree) {
-      this.quadtree.draw(graphics);
-    }
-
-    drawEach(this.asteroids, graphics);
-    drawEach(this.bullets, graphics);
-    drawEach(this.fx, graphics);
-    this.ship.draw(graphics);
-
-    this.drawHud(graphics);
-    this.dirty = false;
-  };
-
   Game.prototype.start = function(startTime) {
     this.time = startTime;
 
@@ -59,7 +45,7 @@ define(
       ent.update();
       ent.wrap(this.width, this.height);
 
-      if (ent.isDead()) {
+      if (!ent.isAlive()) {
         array.remove(arr, i);
         i--;
 
@@ -73,14 +59,12 @@ define(
 
   // TODO: audit the order of these updates.
   Game.prototype.step = function() {
-    this.ship.update();
-    this.ship.wrap(this.width, this.height);
-
     this.stepEach(this.asteroids);
+    this.quadtree.rebuild(this.asteroids);
+
     this.stepEach(this.bullets);
     this.stepEach(this.fx);
-
-    this.quadtree.rebuild(this.asteroids);
+    this.stepShip();
 
     for (var i = 0; i < this.bullets.length; i++) {
       var b = this.bullets[i];
@@ -101,17 +85,31 @@ define(
               Asteroid.create().init(hit.x, hit.y, Math.random(), Math.random(), hit.size-1));
         }
 
-        this.fx.push(Explosion.create().init(hit.x, hit.y));
-        this.fx.push(Explosion.create().init(b.x, b.y));
+        this.fx.push(Explosion.create().init(hit.x, hit.y, 5));
+        this.fx.push(Explosion.create().init(b.x, b.y, 5));
       }
     }
 
-    var hit = this.quadtree.findFirstIsecWith(this.ship);
-    if (hit) {
-      console.log('Ship hit!');
+    this.dirty = true;
+  };
+
+  Game.prototype.stepShip = function() {
+    if (!this.ship || !this.ship.isAlive()) {
+      return;
     }
 
-    this.dirty = true;
+    this.ship.update();
+    this.ship.wrap(this.width, this.height);
+
+    var hit = this.quadtree.findFirstIsecWith(this.ship);
+    if (hit) {
+      this.fx.push(Explosion.create().init(this.ship.x, this.ship.y, 100, 70));
+      // TODO: Can we consolidate dying and freeing?
+      // Also, can we move the explosing spawning into the entity classes?
+      this.ship.die();
+      this.ship.free();
+      this.ship = null;
+    }
   };
 
   Game.prototype.needsToDraw = function() {
@@ -136,6 +134,23 @@ define(
 
   Game.prototype.started = function() {
     return this.time != 0;
+  };
+
+  Game.prototype.draw = function(graphics) {
+    if (debug.vars.draw_quadtree) {
+      this.quadtree.draw(graphics);
+    }
+
+    drawEach(this.asteroids, graphics);
+    drawEach(this.bullets, graphics);
+    drawEach(this.fx, graphics);
+
+    if (this.ship && this.ship.isAlive()) {
+      this.ship.draw(graphics);
+    }
+
+    this.drawHud(graphics);
+    this.dirty = false;
   };
 
   Game.prototype.drawHud = function(graphics) {

@@ -50,8 +50,8 @@ define(['./pooled', './debug'], function(pooled, debug) {
     this.updateTTL();
   };
 
-  Entity.prototype.isDead = function() {
-    return this.dead;
+  Entity.prototype.isAlive = function() {
+    return !this.dead;
   };
 
   Entity.prototype.draw = function(gfx) {
