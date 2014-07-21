@@ -6,12 +6,6 @@ define(
   debug.define('pause_step', 0);
   debug.define('draw_quadtree', false);
 
-  function drawEach(arr, graphics) {
-    for (var i = 0; i < arr.length; i++) {
-      arr[i].draw(graphics);
-    }
-  }
-  
   // TODO: can we somehow have a generic "updateable" list instead of keeping
   // track of separate arrays for each object type? What about a parent array of
   // the underlying arrays?
@@ -26,6 +20,10 @@ define(
     this.bullets = [];
     this.fx = [];
     this.asteroids = [];
+
+    this.ships = [];
+    this.entities = [this.ships, this.bullets, this.fx, this.asteroids];
+
     this.respawnIn = null;
 
     this.quadtree = new Quadtree(0, 0, width, height, 3);
@@ -44,19 +42,44 @@ define(
     }
   };
 
-  Game.prototype.stepEach = function(arr) {
-    for (var i = 0; i < arr.length; i++) {
-      var ent = arr[i];
-      ent.update();
-      ent.wrap(this.width, this.height);
+  Game.prototype.forAllEntities = function(fn) {
+    
+  };
 
-      if (!ent.isAlive()) {
-        array.remove(arr, i);
-        i--;
+  Game.prototype.updateAndWrap = function(ent) {
+    ent.update();
+    ent.wrap(this.width, this.height);
+  };
 
-        // TODO: hack, remove
-        if (typeof ent.free == 'function') {
-          ent.free();
+  Game.prototype.drawEntity = function(ent, graphics) {
+    ent.draw(graphics);
+  };
+
+  Game.prototype.eachEntity = function(fn, arg) {
+    for (var i = 0; i < this.entities.length; i++) {
+      var set = this.entities[i];
+      
+      for (var j = 0; j < set.length; j++) {
+        var ent = set[j];
+        fn.call(this, ent, arg);
+      }
+    }
+  };
+
+  Game.prototype.purgeDead = function() {
+    for (var i = 0; i < this.entities.length; i++) {
+      var set = this.entities[i];
+      for (var j = 0; j < set.length; j++) {
+        var ent = set[j];
+        // TODO: make this part of updateAndWrap somehow?
+        if (!ent.isAlive()) {
+          array.remove(set, j);
+          j--;
+
+          // TODO: hack, remove
+          if (typeof ent.free == 'function') {
+            ent.free();
+          }
         }
       }
     }
@@ -64,11 +87,8 @@ define(
 
   // TODO: audit the order of these updates.
   Game.prototype.step = function() {
-    this.stepEach(this.asteroids);
+    this.eachEntity(this.updateAndWrap);
     this.quadtree.rebuild(this.asteroids);
-
-    this.stepEach(this.bullets);
-    this.stepEach(this.fx);
     this.stepShip();
 
     for (var i = 0; i < this.bullets.length; i++) {
@@ -95,6 +115,7 @@ define(
       }
     }
 
+    this.purgeDead();
     this.dirty = true;
   };
 
@@ -163,9 +184,7 @@ define(
       this.quadtree.draw(graphics);
     }
 
-    drawEach(this.asteroids, graphics);
-    drawEach(this.bullets, graphics);
-    drawEach(this.fx, graphics);
+    this.eachEntity(this.drawEntity, graphics);
 
     if (this.ship && this.ship.isAlive()) {
       this.ship.draw(graphics);
