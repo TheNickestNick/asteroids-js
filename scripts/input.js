@@ -40,10 +40,10 @@ define(function() {
       this.game.ship.shoot(false);
     }
     else if (event.which == Keys.RIGHT) {
-      this.game.ship.turn(0);
+      this.game.ship.turn(1);
     }
     else if (event.which == Keys.LEFT) {
-      this.game.ship.turn(0);
+      this.game.ship.turn(-1);
     }
     else if (event.which == Keys.UP) {
       this.game.ship.thrust(false);

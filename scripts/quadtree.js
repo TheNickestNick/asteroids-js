@@ -19,8 +19,7 @@ define(['./geometry'], function(geometry) {
     }
   }
 
-  Quadtree.prototype.rebuild = function(objects) {
-    this.clear();
+  Quadtree.prototype.addAll = function(objects) {
     for (var i = 0; i < objects.length; i++) {
       this.add(objects[i]);
     }

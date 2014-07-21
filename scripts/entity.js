@@ -15,6 +15,7 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.velr = 0;
     this.ttl = null;
     this.dead = false;
+    this.aliveTime = 0;
     this.spawner = spawner;
   }
 
@@ -22,6 +23,11 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
   Entity.prototype.onStep = abstract;
   Entity.prototype.onDraw = abstract;
   Entity.prototype.onWrap = abstract;
+
+  Entity.prototype.setPosition = function(x, y) {
+    this.x = x;
+    this.y = y;
+  };
 
   Entity.prototype.wrap = function(w, h) {
     while (this.x > w) { this.x -= w; }
@@ -36,6 +42,7 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
       return;
     }
 
+    this.ttl >>>= 0;
     this.ttl--;
     if (this.ttl === 0) {
       this.die();
@@ -51,6 +58,7 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.x += this.velx;
     this.y += this.vely;
     this.r += this.velr;
+    this.aliveTime++;
     this.updateTTL();
     this.onStep();
   };

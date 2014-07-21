@@ -30,7 +30,7 @@ define(
 
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
   Game.SHIP_RESPAWN_TIME = 60;
-  Game.BONUS_SPAWN_CHANCE = 1.0;
+  Game.BONUS_SPAWN_CHANCE = 1.2;
 
   Game.prototype.start = function(startTime) {
     this.time = startTime;
@@ -77,7 +77,12 @@ define(
   };
 
   Game.prototype.startLevel = function() {
-    this.ship = Ship.create(this).init(this.width / 2, this.height / 2);
+    if (this.ship === null) {
+      this.ship = Ship.create(this).init(this.width / 2, this.height / 2);
+    }
+    else {
+      this.ship.setPosition(this.width/2, this.height/2);
+    }
 
     for (var i = 0; i < this.level; i++) {
       this.asteroids.push(
@@ -89,7 +94,9 @@ define(
   // TODO: audit the order of these updates.
   Game.prototype.step = function() {
     this.eachEntity(this.stepAndWrap);
-    this.quadtree.rebuild(this.asteroids);
+    this.quadtree.clear();
+    this.quadtree.addAll(this.asteroids);
+    this.quadtree.addAll(this.bonuses);
     this.stepShip();
 
     for (var i = 0; i < this.bullets.length; i++) {
@@ -140,9 +147,9 @@ define(
     this.ship.step();
     this.ship.wrap(this.width, this.height);
 
-    if (!this.ship.invincible()) {
-      var hit = this.quadtree.findFirstIsecWith(this.ship);
-      if (hit) {
+    var hit = this.quadtree.findFirstIsecWith(this.ship);
+    if (hit) {
+      if (hit.constructor == Asteroid && !this.ship.invincible()) {
         this.fx.push(Explosion.create().init(this.ship.x, this.ship.y, 100, 70));
         // TODO: Can we consolidate dying and freeing?
         // Also, can we move the explosing spawning into the entity classes?
@@ -153,6 +160,10 @@ define(
         if (this.lives > 0) {
           this.respawnIn = Game.SHIP_RESPAWN_TIME;
         }
+      }
+      else if (hit.constructor == Bonus) {
+        hit.applyTo(this.ship, this);
+        hit.die();
       }
     }
   };

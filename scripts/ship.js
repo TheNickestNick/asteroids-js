@@ -9,8 +9,48 @@ define(['./meshes', './entity'], function(meshes, Entity) {
     this.shooting = false;
     this.timeUntilShot = 0;
     this.boundingRadius = 10;
-    this.timeUntilNotInvincible = Ship.INVINCIBILITY_TIME;
+    this.cannonReloadTime = Ship.TIME_BETWEEN_SHOTS;
+    this.cannonRecoil = Ship.SHOT_RECOIL;
+    this.cannons = 1;
+    this.brakes = false;
+    this.makeInvincible(Ship.RESPAWN_INVINCIBILITY_TIME);
     return this;
+  };
+
+  Ship.RESPAWN_INVINCIBILITY_TIME = 80;
+  Ship.ROTATION_SPEED = 0.1;
+  Ship.TIME_BETWEEN_SHOTS = 8;
+  Ship.SHOT_RECOIL = 0.2;
+  Ship.ACCELERATION = 0.25;
+
+  Ship.prototype.respawn = function(x, y) {
+    this.x = x;
+    this.y = y;
+    this.r = 0;
+    this.makeInvincible(Ship.RESPAWN_INVINCIBILITY_TIME);
+  };
+
+  Ship.prototype.enableBrakes = function() {
+    this.brakes = true;
+  };
+
+  Ship.prototype.decreaseRecoil = function() {
+    this.cannonRecoil -= 0.04;
+    if (this.cannonRecoil < 0) {
+      this.cannonRecoil = 0;
+    }
+  };
+
+  Ship.prototype.decreaseReload = function() {
+    if (this.cannonReloadTime > 1) {
+      this.cannonReloadTime--;
+    }
+  };
+
+  Ship.prototype.addCannon = function() {
+    if (this.cannons < 3) {
+      this.cannons++;
+    }
   };
 
   Ship.prototype.thrust = function(thrusting) {
@@ -22,11 +62,15 @@ define(['./meshes', './entity'], function(meshes, Entity) {
   };
 
   Ship.prototype.turn = function(direction) {
-    this.velr = direction * Ship.ROTATION_SPEED;
+    this.velr += direction * Ship.ROTATION_SPEED;
   };
 
   Ship.prototype.invincible = function() {
-    return this.timeUntilNotInvincible > 0;
+    return this.aliveTime < this.invincibleUntil;
+  };
+
+  Ship.prototype.makeInvincible = function(length) {
+    this.invincibleUntil = this.aliveTime + length;
   };
 
   Ship.prototype.fire = function(dirOffset) {
@@ -36,29 +80,34 @@ define(['./meshes', './entity'], function(meshes, Entity) {
     this.spawner.spawnBullet(this.x, this.y, this.velx, this.vely, bdir);
 
     // recoil
-    this.velx += Math.sin(bdir) * Ship.SHOT_RECOIL;
-    this.vely -= Math.cos(bdir) * Ship.SHOT_RECOIL;
+    this.velx += Math.sin(bdir) * this.cannonRecoil;
+    this.vely -= Math.cos(bdir) * this.cannonRecoil;
   };
-
-  Ship.INVINCIBILITY_TIME = 80;
-  Ship.ROTATION_SPEED = 0.1;
-  Ship.TIME_BETWEEN_SHOTS = 8;
-  Ship.SHOT_RECOIL = 0.06;
-  Ship.ACCELERATION = 0.35;
 
   Ship.prototype.onStep = function() {
     if (this.thrusting) {
       this.velx -= Math.sin(this.r) * Ship.ACCELERATION;
       this.vely += Math.cos(this.r) * Ship.ACCELERATION;
     }
+    else if (this.brakes) {
+      this.velx = 0;
+      this.vely = 0;
+    }
 
     if (this.shooting && this.timeUntilShot <= 0) {
-      this.timeUntilShot = Ship.TIME_BETWEEN_SHOTS;
-      this.fire(0);
+      this.timeUntilShot = this.cannonReloadTime;
+
+      if (this.cannons == 1 || this.cannons == 3) {
+        this.fire(0);
+      }
+
+      if (this.cannons == 2 || this.cannons == 3) {
+        this.fire(-0.1);
+        this.fire(0.1);
+      }
     }
 
     this.timeUntilShot -= 1;
-    this.timeUntilNotInvincible -= 1;
   };
   
   Ship.prototype.onDraw = function(ctx) {
@@ -68,7 +117,7 @@ define(['./meshes', './entity'], function(meshes, Entity) {
   
     var fillStyle = null;
     if (this.invincible()) {
-      fillStyle = this.timeUntilNotInvincible % 2 == 0 ? 'black' : null;
+      fillStyle = this.aliveTime % 2 == 0 ? 'black' : null;
     }
 
     meshes.ship.draw(ctx, fillStyle);
