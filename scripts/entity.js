@@ -19,14 +19,16 @@ define(['./pooled', './debug'], function(pooled, debug) {
   }
 
   Entity.prototype.onDie = abstract;
-  Entity.prototype.onUpdate = abstract;
+  Entity.prototype.onStep = abstract;
   Entity.prototype.onDraw = abstract;
+  Entity.prototype.onWrap = abstract;
 
   Entity.prototype.wrap = function(w, h) {
     while (this.x > w) { this.x -= w; }
     while (this.x < 0) { this.x += w; }
     while (this.y > h) { this.y -= h; }
     while (this.y < 0) { this.y += h; }
+    this.onWrap(w, h);
   };
 
   Entity.prototype.updateTTL = function() {
@@ -45,12 +47,12 @@ define(['./pooled', './debug'], function(pooled, debug) {
     this.onDie();
   };
 
-  Entity.prototype.update = function() {
+  Entity.prototype.step = function() {
     this.x += this.velx;
     this.y += this.vely;
     this.r += this.velr;
     this.updateTTL();
-    this.onUpdate();
+    this.onStep();
   };
 
   Entity.prototype.isAlive = function() {

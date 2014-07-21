@@ -48,7 +48,7 @@ define(['./meshes', './entity'],
   Ship.SHOT_RECOIL = 0.06;
   Ship.ACCELERATION = 0.35;
 
-  Ship.prototype.onUpdate = function() {
+  Ship.prototype.onStep = function() {
     if (this.thrusting) {
       this.velx -= Math.sin(this.r) * Ship.ACCELERATION;
       this.vely += Math.cos(this.r) * Ship.ACCELERATION;

@@ -37,8 +37,8 @@ define(
     }
   };
 
-  Game.prototype.updateAndWrap = function(ent) {
-    ent.update();
+  Game.prototype.stepAndWrap = function(ent) {
+    ent.step();
     ent.wrap(this.width, this.height);
   };
 
@@ -62,7 +62,7 @@ define(
       var set = this.entities[i];
       for (var j = 0; j < set.length; j++) {
         var ent = set[j];
-        // TODO: make this part of updateAndWrap somehow?
+        // TODO: make this part of stepAndWrap somehow?
         if (!ent.isAlive()) {
           array.remove(set, j);
           j--;
@@ -78,7 +78,7 @@ define(
 
   // TODO: audit the order of these updates.
   Game.prototype.step = function() {
-    this.eachEntity(this.updateAndWrap);
+    this.eachEntity(this.stepAndWrap);
     this.quadtree.rebuild(this.asteroids);
     this.stepShip();
 
@@ -115,7 +115,7 @@ define(
       return;
     }
 
-    this.ship.update();
+    this.ship.step();
     this.ship.wrap(this.width, this.height);
 
     if (!this.ship.invincible()) {

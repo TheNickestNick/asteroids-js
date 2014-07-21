@@ -31,7 +31,7 @@ define(['./entity','./textures', './utils'], function(Entity, textures, utils) {
     }
   });
 
-  Asteroid.prototype.onUpdate = function() {
+  Asteroid.prototype.onStep = function() {
     this.u += this.velu;
     this.v += this.velv;
   };

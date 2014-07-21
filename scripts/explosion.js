@@ -33,47 +33,47 @@ define(['./entity', './array'], function(Entity, array) {
         p.color = array.random(COLORS); 
       }
       return this;
-    },
-
-    update: function() {
-      var shouldDie = true;
-      for (var i = 0; i < this.particleCount; i++) {
-        var p = this.particles[i];
-        p.x += p.velx;
-        p.y += p.vely;
-        p.ttl--;
-        shouldDie = shouldDie && (p.ttl <= 0);
-      }
-
-      if (shouldDie) {
-        this.die();
-      }
-    },
-
-    wrap: function(w, h) {
-      Entity.prototype.wrap.call(this);
-      for (var i = 0; i < this.particlesCount; i++) {
-        var p = this.particles[i];
-        while (p.x > w) { p.x -= w; }
-        while (p.x < 0) { p.x += w; }
-        while (p.y > h) { p.y -= h; }
-        while (p.y < 0) { p.y += h; }
-      }
-    },
-
-    draw: function(graphics) {
-      for (var i = 0; i < this.particleCount; i++) {
-        var p = this.particles[i];
-        if (p.ttl > 0) {
-          graphics.drawCircle(this.x + p.x, this.y + p.y, 1.5, p.color);
-        }
-      }
     }
   });
 
   // TODO: make this configurable in the init method
   Explosion.MAX_PARTICLE_COUNT = 100;
   Explosion.DEFAULT_MAX_PARTICLE_TTL = 10;
+
+  Explosion.prototype.onDraw = function(graphics) {
+    for (var i = 0; i < this.particleCount; i++) {
+      var p = this.particles[i];
+      if (p.ttl > 0) {
+        graphics.drawCircle(this.x + p.x, this.y + p.y, 1.5, p.color);
+      }
+    }
+  };
+
+  Explosion.prototype.onStep = function() {
+    var shouldDie = true;
+    for (var i = 0; i < this.particleCount; i++) {
+      var p = this.particles[i];
+      p.x += p.velx;
+      p.y += p.vely;
+      p.ttl--;
+      shouldDie = shouldDie && (p.ttl <= 0);
+    }
+
+    if (shouldDie) {
+      this.die();
+    }
+  };
+
+  // TODO: not working for some reason
+  Explosion.prototype.onWrap = function(w, h) {
+    for (var i = 0; i < this.particlesCount; i++) {
+      var p = this.particles[i];
+      while (p.x > w) { p.x -= w; }
+      while (p.x < 0) { p.x += w; }
+      while (p.y > h) { p.y -= h; }
+      while (p.y < 0) { p.y += h; }
+    }
+  };
 
   return Explosion;
 });
