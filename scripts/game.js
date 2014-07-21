@@ -126,7 +126,10 @@ define(
         this.ship.die();
         this.ship.free();
         this.ship = null;
-        this.respawnIn = Game.SHIP_RESPAWN_TIME;
+
+        if (this.lives > 0) {
+          this.respawnIn = Game.SHIP_RESPAWN_TIME;
+        }
       }
     }
   };
@@ -175,7 +178,6 @@ define(
   Game.prototype.drawHud = function(graphics) {
     var ctx = graphics.context();
     ctx.save();
-
     ctx.translate(this.width-3, 0);
     ctx.rotate(Math.PI);
     ctx.scale(0.8, 0.8);
@@ -185,14 +187,28 @@ define(
       graphics.drawMesh(meshes.ship, 'white');
       ctx.translate(12, 0);
     }
-
     ctx.restore();
+
+    // TODO: generalize text drawing into graphics class
     ctx.save();
     ctx.fillStyle = 'white';
     ctx.font = '22px Verdana';
     var textSize = ctx.measureText(this.points);
     ctx.fillText(this.points, this.width - textSize.width - 8, 58);
     ctx.restore();
+
+    if (this.over()) {
+      ctx.save();
+      ctx.fillStyle = 'red';
+      ctx.font = '50px Courier New';
+      var textSize = ctx.measureText('game over');
+      ctx.fillText('game over', this.width/2 - textSize.width/2, this.height/2);
+      ctx.restore();
+    }
+  };
+
+  Game.prototype.over = function() {
+    return this.lives == 0 && this.ship == null;
   };
 
   Game.prototype.spawnBullet = function(x, y, velx, vely, dir) {

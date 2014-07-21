@@ -2,6 +2,7 @@ define(['./textures'], function(textures) {
   var canvas = null;
   var context = null;
 
+  // TODO: maybe make this a stateless static class and pass a context around directly?
   return {
     init: function(canvas_, callback) {
       canvas = canvas_;
