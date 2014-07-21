@@ -1,7 +1,7 @@
 define(
     ['./ship', './asteroid', './quadtree', './meshes', './array', './explosion', './debug', 
-     './bullet'], 
-    function(Ship, Asteroid, Quadtree, meshes, array, Explosion, debug, Bullet) {
+     './bullet', './hud'], 
+    function(Ship, Asteroid, Quadtree, meshes, array, Explosion, debug, Bullet, hud) {
   debug.define('pause', false);
   debug.define('pause_step', 0);
   debug.define('draw_quadtree', false);
@@ -18,7 +18,7 @@ define(
     this.fx = [];
     this.asteroids = [];
     // TODO: somehow make ship part of this
-    this.entities = [this.bullets, this.fx, this.asteroids];
+    this.entities = [this.bullets, this.asteroids, this.fx];
 
     this.respawnIn = null;
     this.quadtree = new Quadtree(0, 0, width, height, 3);
@@ -170,40 +170,8 @@ define(
       this.ship.draw(graphics);
     }
 
-    this.drawHud(graphics);
+    hud.draw(graphics.context(), this);
     this.dirty = false;
-  };
-
-  Game.prototype.drawHud = function(graphics) {
-    var ctx = graphics.context();
-    ctx.save();
-    ctx.translate(this.width-3, 0);
-    ctx.rotate(Math.PI);
-    ctx.scale(0.8, 0.8);
-    ctx.translate(0, -34);
-    for (var i = 0; i < this.lives; i++) {
-      ctx.translate(20, 0);
-      meshes.ship.draw(ctx, 'white');
-      ctx.translate(12, 0);
-    }
-    ctx.restore();
-
-    // TODO: generalize text drawing into graphics class
-    ctx.save();
-    ctx.fillStyle = 'white';
-    ctx.font = '22px Verdana';
-    var textSize = ctx.measureText(this.points);
-    ctx.fillText(this.points, this.width - textSize.width - 8, 58);
-    ctx.restore();
-
-    if (this.over()) {
-      ctx.save();
-      ctx.fillStyle = 'red';
-      ctx.font = '50px Courier New';
-      var textSize = ctx.measureText('game over');
-      ctx.fillText('game over', this.width/2 - textSize.width/2, this.height/2);
-      ctx.restore();
-    }
   };
 
   Game.prototype.over = function() {

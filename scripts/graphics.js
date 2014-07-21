@@ -19,18 +19,6 @@ define(['./textures'], function(textures) {
       context.restore();
     },
 
-    outlineCircle: function(x, y, r, style, width) {
-      width = width || 1;
-      context.save();
-      context.beginPath();
-      context.arc(x, y, r, 0, 2 * Math.PI);
-      context.closePath();
-      context.strokeStyle = style;
-      context.lineWidth = width;
-      context.stroke();
-      context.restore();
-    },
-
     fillBox: function(l, t, r, b, style) {
       context.save();
       context.fillStyle = style;
