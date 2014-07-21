@@ -1,4 +1,6 @@
-define(['./pooled'], function(pooled) {
+define(['./pooled', './debug'], function(pooled, debug) {
+  debug.define('draw_bounds', false);
+
   function Entity(spawner) {
     this.x = 0;
     this.y = 0;
@@ -52,6 +54,12 @@ define(['./pooled'], function(pooled) {
     return this.dead;
   };
 
+  Entity.prototype.draw = function(gfx) {
+    if (debug.vars.draw_bounds) {
+      gfx.outlineCircle(this.x, this.y, this.boundingRadius, 'orange', 2);
+    }
+  };
+
   Entity.define = function(defn) {
     var constructor;
 
@@ -71,15 +79,23 @@ define(['./pooled'], function(pooled) {
     constructor.prototype.constructor = constructor;
 
     for (var k in defn) {
-      if (k !== 'update' && k !== 'ctor') {
+      if (!(k in constructor.prototype)) {
         constructor.prototype[k] = defn[k];
       }
     }
 
+    // TODO: generalize this concept of overloading
     if (typeof defn.update === 'function') {
       constructor.prototype.update = function() {
         Entity.prototype.update.call(this);
         defn.update.call(this);
+      };
+    }
+
+    if (typeof defn.draw === 'function') {
+      constructor.prototype.draw = function(gfx) {
+        Entity.prototype.draw.call(this, gfx);
+        defn.draw.call(this, gfx);
       };
     }
 

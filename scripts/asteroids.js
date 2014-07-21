@@ -8,9 +8,6 @@ define(['./config', './graphics', './meshes', './input', './game', './debug'],
   function mainLoop(time) {
     window.requestAnimationFrame(mainLoop);
 
-    if (debug.vars.pause) {
-      return;
-    }
 
     if (debug.vars.skip_frames) {
       if (skipCounter > 0) {
@@ -27,9 +24,11 @@ define(['./config', './graphics', './meshes', './input', './game', './debug'],
     }
 
     game.runUntil(time, input);
-    
-    graphics.clear('black');
-    game.draw(graphics);
+
+    if (game.needsToDraw()) {
+      graphics.clear('black');
+      game.draw(graphics);
+    }
   }
 
   return {

@@ -3,6 +3,8 @@ define(
      './bullet'], 
     function(Ship, Asteroid, Quadtree, meshes, array, Explosion, debug, Bullet) {
   debug.define('pause', false);
+  debug.define('pause_step', 0);
+  debug.define('draw_quadtree', false);
 
   function drawEach(arr, graphics) {
     for (var i = 0; i < arr.length; i++) {
@@ -28,7 +30,7 @@ define(
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
 
   Game.prototype.draw = function(graphics) {
-    if (window.debug_draw_quadtree) {
+    if (debug.vars.draw_quadtree) {
       this.quadtree.draw(graphics);
     }
 
@@ -38,6 +40,7 @@ define(
     this.ship.draw(graphics);
 
     this.drawHud(graphics);
+    this.dirty = false;
   };
 
   Game.prototype.start = function(startTime) {
@@ -102,16 +105,32 @@ define(
         this.fx.push(Explosion.create().init(b.x, b.y));
       }
     }
+
+    var hit = this.quadtree.findFirstIsecWith(this.ship);
+    if (hit) {
+      console.log('Ship hit!');
+    }
+
+    this.dirty = true;
+  };
+
+  Game.prototype.needsToDraw = function() {
+    return this.dirty;
   };
   
   Game.prototype.runUntil = function(time) {
     while (this.time + Game.STEP_TIME_MS < time) {
-      if (!debug.vars.pause) {
+      this.time += Game.STEP_TIME_MS;
+
+      if (!debug.vars.pause) { 
         this.step();
       }
+    }
 
-      // TODO: add a way to single-step from the console
-      this.time += Game.STEP_TIME_MS;
+    if (debug.vars.pause) {
+      for (; debug.vars.pause_step > 0; debug.vars.pause_step--) {
+        this.step();
+      }
     }
   };
 

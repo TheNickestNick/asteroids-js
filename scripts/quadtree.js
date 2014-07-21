@@ -62,6 +62,33 @@ define(['./geometry'], function(geometry) {
     if (this.children) {
       for (var i = 0; i < this.children.length; i++) {
         var result = this.children[i].findFirstIsecWithPoint(x, y);
+        if (result) {
+          return result;
+        }
+      }
+    }
+
+    if (this.objects) {
+      for (var i = 0; i < this.objects.length; i++) {
+        var o = this.objects[i];
+        // TODO: should Entity contain bounds checking logic like this?
+        if (!o.isDead() && geometry.circleContainsPoint(o.x, o.y, o.boundingRadius, x, y)) {
+          return o;
+        }
+      }
+    }
+
+    return null;
+  };
+
+  Quadtree.prototype.findFirstIsecWith = function(obj) {
+    if (!this.aabb.intersectsCircle(obj.x, obj.y, obj.boundingRadius)) {
+      return null;
+    };
+
+    if (this.children) {
+      for (var i = 0; i < this.children.length; i++) {
+        var result = this.children[i].findFirstIsecWith(obj);
         if (result && !result.isDead()) {
           return result;
         }
@@ -72,13 +99,12 @@ define(['./geometry'], function(geometry) {
       for (var i = 0; i < this.objects.length; i++) {
         var o = this.objects[i];
         // TODO: should Entity contain bounds checking logic like this?
-        if (geometry.circleContainsPoint(o.x, o.y, o.boundingRadius, x, y)) {
+        if (!o.isDead() && geometry.circlesIntersect(o.x, o.y, o.boundingRadius, 
+                                                     obj.x, obj.y, obj.boundingRadius)) {
           return o;
         }
       }
     }
-
-    return null;
   };
 
   // TODO: clean this up by making a debug package
@@ -106,7 +132,7 @@ define(['./geometry'], function(geometry) {
     if (this.objects) {
       for (var i = 0; i < this.objects.length; i++) {
         var o = this.objects[i];
-        graphics.drawCircle(o.x, o.y, o.boundingRadius, color, true);
+        graphics.drawCircle(o.x, o.y, o.boundingRadius, 'white', true);
       }
     }
   };
