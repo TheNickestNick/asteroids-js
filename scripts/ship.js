@@ -79,7 +79,7 @@ define(['./meshes', './entity'],
     }
   });
 
-  Ship.INVINCIBILITY_TIME = 50;
+  Ship.INVINCIBILITY_TIME = 80;
   Ship.ROTATION_SPEED = 0.1;
   Ship.TIME_BETWEEN_SHOTS = 2;
   Ship.SHOT_RECOIL = 0.06;

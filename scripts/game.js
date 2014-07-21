@@ -12,26 +12,31 @@ define(
     }
   }
   
+  // TODO: can we somehow have a generic "updateable" list instead of keeping
+  // track of separate arrays for each object type? What about a parent array of
+  // the underlying arrays?
   var Game = function(width, height) {
     this.width = width;
     this.height = height;
-    this.ship = Ship.create(this).init(width / 2, height / 2);
-    this.bullets = [];
     this.time = 0;
     this.points = 0;
     this.lives = 2;
 
+    this.ship = null;
+    this.bullets = [];
     this.fx = [];
     this.asteroids = [];
+    this.respawnIn = null;
 
     this.quadtree = new Quadtree(0, 0, width, height, 3);
   };
 
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
+  Game.SHIP_RESPAWN_TIME = 60;
 
   Game.prototype.start = function(startTime) {
     this.time = startTime;
-
+    this.ship = Ship.create(this).init(this.width / 2, this.height / 2);
     for (var i = 0; i < 10; i++) {
       this.asteroids.push(
         Asteroid.create().init(Math.random() * this.width, Math.random() * this.height,
@@ -95,20 +100,34 @@ define(
 
   Game.prototype.stepShip = function() {
     if (!this.ship || !this.ship.isAlive()) {
+      // TODO: generalize the concept of a timer, or at least "in X steps, I want Y to happen"
+      if (this.respawnIn > 0) {
+        this.respawnIn--;
+      }
+
+      if (this.respawnIn == 0) {
+        this.lives--;
+        this.ship = Ship.create(this).init(this.width / 2, this.height / 2);
+        this.respawnIn = null;
+      }
+
       return;
     }
 
     this.ship.update();
     this.ship.wrap(this.width, this.height);
 
-    var hit = this.quadtree.findFirstIsecWith(this.ship);
-    if (hit) {
-      this.fx.push(Explosion.create().init(this.ship.x, this.ship.y, 100, 70));
-      // TODO: Can we consolidate dying and freeing?
-      // Also, can we move the explosing spawning into the entity classes?
-      this.ship.die();
-      this.ship.free();
-      this.ship = null;
+    if (!this.ship.invincible()) {
+      var hit = this.quadtree.findFirstIsecWith(this.ship);
+      if (hit) {
+        this.fx.push(Explosion.create().init(this.ship.x, this.ship.y, 100, 70));
+        // TODO: Can we consolidate dying and freeing?
+        // Also, can we move the explosing spawning into the entity classes?
+        this.ship.die();
+        this.ship.free();
+        this.ship = null;
+        this.respawnIn = Game.SHIP_RESPAWN_TIME;
+      }
     }
   };
 
