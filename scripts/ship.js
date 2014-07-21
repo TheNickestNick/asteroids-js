@@ -23,8 +23,6 @@ define(['./meshes', './entity'],
       if (this.shooting && this.timeUntilShot <= 0) {
         this.timeUntilShot = Ship.TIME_BETWEEN_SHOTS;
         this.fire(0);
-        this.fire(0.1);
-        this.fire(-0.1);
       }
 
       this.timeUntilShot -= 1;
@@ -81,8 +79,8 @@ define(['./meshes', './entity'],
 
   Ship.INVINCIBILITY_TIME = 80;
   Ship.ROTATION_SPEED = 0.1;
-  Ship.TIME_BETWEEN_SHOTS = 2;
+  Ship.TIME_BETWEEN_SHOTS = 8;
   Ship.SHOT_RECOIL = 0.06;
-  Ship.ACCELERATION = 0.5;
+  Ship.ACCELERATION = 0.35;
   return Ship;
 });

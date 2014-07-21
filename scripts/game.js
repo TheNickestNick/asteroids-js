@@ -6,9 +6,6 @@ define(
   debug.define('pause_step', 0);
   debug.define('draw_quadtree', false);
 
-  // TODO: can we somehow have a generic "updateable" list instead of keeping
-  // track of separate arrays for each object type? What about a parent array of
-  // the underlying arrays?
   var Game = function(width, height) {
     this.width = width;
     this.height = height;

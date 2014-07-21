@@ -1,4 +1,4 @@
-define(['./entity','./textures'], function(Entity, textures) {
+define(['./entity','./textures', './utils'], function(Entity, textures, utils) {
   var asteroidTextures = ['rock1', 'rock2', 'rock3', 'rock4'];
 
   var Asteroid = Entity.define({
@@ -31,11 +31,15 @@ define(['./entity','./textures'], function(Entity, textures) {
 
     onDie: function() {
       if (this.size > 1) {
-        this.spawner.spawnAsteroid(
-            Asteroid.create().init(this.x, this.y, Math.random(), Math.random(), this.size - 1)); 
-        this.spawner.spawnAsteroid(
-            Asteroid.create().init(this.x, this.y, Math.random(), Math.random(), this.size - 1)); 
+        this.spawnChild();
+        this.spawnChild();
       }
+    },
+
+    spawnChild: function() {
+      this.spawner.spawnAsteroid(
+          Asteroid.create().init(
+              this.x, this.y, utils.random(-1, 1), utils.random(-1, 1), this.size - 1)); 
     },
 
     draw: function(graphics) {

@@ -3,6 +3,9 @@ define(['./pooled', './debug'], function(pooled, debug) {
 
   function abstract() {}
 
+  // REFACTORING IDEA:
+  //  Don't allow any overrides at all. Have abstract "onX" methods that get called from
+  //  the base entity methods.
   function Entity(spawner) {
     this.x = 0;
     this.y = 0;
