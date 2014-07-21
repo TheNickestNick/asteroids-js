@@ -1,7 +1,7 @@
 define(
     ['./ship', './asteroid', './quadtree', './meshes', './array', './explosion', './debug', 
-     './bullet', './hud'], 
-    function(Ship, Asteroid, Quadtree, meshes, array, Explosion, debug, Bullet, hud) {
+     './bullet', './hud', './bonus'], 
+    function(Ship, Asteroid, Quadtree, meshes, array, Explosion, debug, Bullet, hud, Bonus) {
   debug.define('pause', false);
   debug.define('pause_step', 0);
   debug.define('draw_quadtree', false);
@@ -14,13 +14,15 @@ define(
     this.points = 0;
     this.lives = 2;
     this.xp = 0;
+    this.level = 1;
 
     this.ship = null;
     this.bullets = [];
     this.fx = [];
     this.asteroids = [];
+    this.bonuses = [];
     // TODO: somehow make ship part of this
-    this.entities = [this.bullets, this.asteroids, this.fx];
+    this.entities = [this.bullets, this.asteroids, this.fx, this.bonuses];
 
     this.respawnIn = null;
     this.quadtree = new Quadtree(0, 0, width, height, 3);
@@ -28,15 +30,11 @@ define(
 
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
   Game.SHIP_RESPAWN_TIME = 60;
+  Game.BONUS_SPAWN_CHANCE = 1.0;
 
   Game.prototype.start = function(startTime) {
     this.time = startTime;
-    this.ship = Ship.create(this).init(this.width / 2, this.height / 2);
-    for (var i = 0; i < 10; i++) {
-      this.asteroids.push(
-        Asteroid.create(this).init(Math.random() * this.width, Math.random() * this.height,
-          Math.random(), Math.random()));
-    }
+    this.startLevel();
   };
 
   Game.prototype.stepAndWrap = function(ent) {
@@ -78,6 +76,16 @@ define(
     }
   };
 
+  Game.prototype.startLevel = function() {
+    this.ship = Ship.create(this).init(this.width / 2, this.height / 2);
+
+    for (var i = 0; i < this.level; i++) {
+      this.asteroids.push(
+          Asteroid.create(this).init(Math.random() * this.width, Math.random() * this.height,
+              Math.random(), Math.random()));
+    }
+  };
+
   // TODO: audit the order of these updates.
   Game.prototype.step = function() {
     this.eachEntity(this.stepAndWrap);
@@ -95,10 +103,21 @@ define(
         this.xp += 10;
         this.fx.push(Explosion.create().init(hit.x, hit.y, 5));
         this.fx.push(Explosion.create().init(b.x, b.y, 5));
+
+        // TODO: push into asteroid class?
+        if (Math.random() < Game.BONUS_SPAWN_CHANCE) {
+          this.bonuses.push(Bonus.create(this).init(hit.x, hit.y));
+        }
       }
     }
 
     this.purgeDead();
+
+    if (this.asteroids.length === 0) {
+      this.level++;
+      this.startLevel();
+    }
+    
     this.dirty = true;
   };
 
