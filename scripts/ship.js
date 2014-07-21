@@ -1,46 +1,45 @@
-define(['./meshes', './entity'], 
-    function(meshes, Entity) {
+define(['./meshes', './entity'], function(meshes, Entity) {
 
-  var Ship = Entity.define({
-    init: function(x, y) {
-      this.x = x;
-      this.y = y;
-      this.turning = 0;
-      this.thrusting = false;
-      this.shooting = false;
-      this.timeUntilShot = 0;
-      this.boundingRadius = 10;
-      this.timeUntilNotInvincible = Ship.INVINCIBILITY_TIME;
-      return this;
-    },
+  var Ship = Entity.subclass();
 
-    thrust: function(thrusting) {
-      this.thrusting = thrusting;
-    },
+  Ship.prototype.init = function(x, y) {
+    this.x = x;
+    this.y = y;
+    this.turning = 0;
+    this.thrusting = false;
+    this.shooting = false;
+    this.timeUntilShot = 0;
+    this.boundingRadius = 10;
+    this.timeUntilNotInvincible = Ship.INVINCIBILITY_TIME;
+    return this;
+  };
 
-    shoot: function(shooting) {
-      this.shooting = shooting;
-    },
+  Ship.prototype.thrust = function(thrusting) {
+    this.thrusting = thrusting;
+  };
 
-    turn: function(direction) {
-      this.velr = direction * Ship.ROTATION_SPEED;
-    },
+  Ship.prototype.shoot = function(shooting) {
+    this.shooting = shooting;
+  };
 
-    invincible: function() {
-      return this.timeUntilNotInvincible > 0;
-    },
+  Ship.prototype.turn = function(direction) {
+    this.velr = direction * Ship.ROTATION_SPEED;
+  };
 
-    fire: function(dirOffset) {
-      dirOffset = dirOffset || 0;
-      var spread = 0.1;
-      var bdir = this.r + dirOffset + (Math.random()*spread - (spread/2));
-      this.spawner.spawnBullet(this.x, this.y, this.velx, this.vely, bdir);
+  Ship.prototype.invincible = function() {
+    return this.timeUntilNotInvincible > 0;
+  };
 
-      // recoil
-      this.velx += Math.sin(bdir) * Ship.SHOT_RECOIL;
-      this.vely -= Math.cos(bdir) * Ship.SHOT_RECOIL;
-    },
-  });
+  Ship.prototype.fire = function(dirOffset) {
+    dirOffset = dirOffset || 0;
+    var spread = 0.1;
+    var bdir = this.r + dirOffset + (Math.random()*spread - (spread/2));
+    this.spawner.spawnBullet(this.x, this.y, this.velx, this.vely, bdir);
+
+    // recoil
+    this.velx += Math.sin(bdir) * Ship.SHOT_RECOIL;
+    this.vely -= Math.cos(bdir) * Ship.SHOT_RECOIL;
+  };
 
   Ship.INVINCIBILITY_TIME = 80;
   Ship.ROTATION_SPEED = 0.1;

@@ -67,37 +67,23 @@ define(['./pooled', './debug'], function(pooled, debug) {
     this.onDraw(gfx);
   };
 
-  Entity.define = function(defn) {
+  Entity.subclass = function(ctor) {
     var constructor;
 
-    if (typeof defn.ctor === 'function') {
+    if (typeof ctor === 'function') {
       constructor = function(arg) {
         Entity.call(this, arg);
-        defn.ctor.call(this);
+        ctor.call(this, arg);
       };
     }
     else {
       constructor = function(arg) {
         Entity.call(this, arg);
-      }
+      };
     }
 
     constructor.prototype = new Entity();
     constructor.prototype.constructor = constructor;
-
-    for (var k in defn) {
-      if (!(k in constructor.prototype) || constructor.prototype[k] === abstract) {
-        constructor.prototype[k] = defn[k];
-      }
-    }
-
-    // TODO: generalize this concept of overloading
-    if (typeof defn.update === 'function') {
-      constructor.prototype.update = function() {
-        Entity.prototype.update.call(this);
-        defn.update.call(this);
-      };
-    }
 
     return pooled.makePooled(constructor);
   };

@@ -5,40 +5,37 @@ define(['./entity', './array'], function(Entity, array) {
   var COLORS = ['red', 'orange', 'yellow', 'white'];
   //COLORS = ['white'];
 
-  var Explosion = Entity.define({
-    ctor: function() {
-      this.particles = [];
-      this.particleCount = 0;
-      
-      for (var i = 0; i < Explosion.MAX_PARTICLE_COUNT; i++) {
-        this.particles.push({
-          x: 0, y: 0, velx: 0, vely: 0, ttl: 0
-        });
-      }
-    },
+  var Explosion = Entity.subclass(function(){
+    this.particles = [];
+    this.particleCount = 0;
     
-    init: function(x, y, particleCount, maxTTL) {
-      this.particleCount = particleCount || this.particles.length;
-      maxTTL = maxTTL || Explosion.DEFAULT_MAX_PARTICLE_TTL;
-
-      for (var i = 0; i < this.particleCount; i++) {
-        var p = this.particles[i];
-        p.x = x;
-        p.y = y;
-
-        // TODO: make this generic, we do this a lot.
-        p.velx = (Math.random() * 15) - 7.5;
-        p.vely = (Math.random() * 15) - 7.5;
-        p.ttl = (Math.random() * maxTTL);
-        p.color = array.random(COLORS); 
-      }
-      return this;
+    for (var i = 0; i < Explosion.MAX_PARTICLE_COUNT; i++) {
+      this.particles.push({
+        x: 0, y: 0, velx: 0, vely: 0, ttl: 0
+      });
     }
   });
-
-  // TODO: make this configurable in the init method
+    
   Explosion.MAX_PARTICLE_COUNT = 100;
   Explosion.DEFAULT_MAX_PARTICLE_TTL = 10;
+
+  Explosion.prototype.init = function(x, y, particleCount, maxTTL) {
+    this.particleCount = particleCount || this.particles.length;
+    maxTTL = maxTTL || Explosion.DEFAULT_MAX_PARTICLE_TTL;
+
+    for (var i = 0; i < this.particleCount; i++) {
+      var p = this.particles[i];
+      p.x = x;
+      p.y = y;
+
+      // TODO: make this generic, we do this a lot.
+      p.velx = (Math.random() * 15) - 7.5;
+      p.vely = (Math.random() * 15) - 7.5;
+      p.ttl = (Math.random() * maxTTL);
+      p.color = array.random(COLORS); 
+    }
+    return this;
+  };
 
   Explosion.prototype.onDraw = function(graphics) {
     for (var i = 0; i < this.particleCount; i++) {
