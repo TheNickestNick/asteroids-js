@@ -183,7 +183,7 @@ define(
     ctx.translate(0, -34);
     for (var i = 0; i < this.lives; i++) {
       ctx.translate(20, 0);
-      graphics.drawMesh(meshes.ship, 'white');
+      meshes.ship.draw(ctx, 'white');
       ctx.translate(12, 0);
     }
     ctx.restore();

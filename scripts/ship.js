@@ -1,5 +1,4 @@
 define(['./meshes', './entity'], function(meshes, Entity) {
-
   var Ship = Entity.subclass();
 
   Ship.prototype.init = function(x, y) {
@@ -74,10 +73,10 @@ define(['./meshes', './entity'], function(meshes, Entity) {
         fillStyle = self.timeUntilNotInvincible % 2 == 0 ? 'black' : null;
       }
 
-      graphics.drawMesh(meshes.ship, fillStyle);
+      meshes.ship.draw(context, fillStyle);
 
       if (self.thrusting) {
-        graphics.drawMesh(meshes.thrust);
+        meshes.thrust.draw(context);
       }
     });
   };

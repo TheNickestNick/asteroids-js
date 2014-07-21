@@ -84,7 +84,6 @@ define(['./pooled', './debug'], function(pooled, debug) {
 
     constructor.prototype = new Entity();
     constructor.prototype.constructor = constructor;
-
     return pooled.makePooled(constructor);
   };
 
