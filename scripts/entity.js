@@ -1,4 +1,4 @@
-define(['./pooled', './debug'], function(pooled, debug) {
+define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
   debug.define('draw_bounds', false);
 
   function abstract() {}
@@ -59,15 +59,20 @@ define(['./pooled', './debug'], function(pooled, debug) {
     return !this.dead;
   };
 
-  Entity.prototype.draw = function(gfx) {
-    if (debug.vars.draw_bounds) {
-      gfx.outlineCircle(this.x, this.y, this.boundingRadius, 'orange', 2);
-    }
-
-    var ctx = gfx.context();
+  Entity.prototype.draw = function(graphics) {
+    var ctx = graphics.context();
     ctx.save();
     this.onDraw(ctx);
     ctx.restore();
+
+    if (debug.vars.draw_bounds) {
+      ctx.save();
+      gfx.circle(ctx, this.x, this.y, this.boundingRadius);
+      ctx.strokeStyle = 'teal';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+    }
   };
 
   Entity.subclass = function(ctor) {
