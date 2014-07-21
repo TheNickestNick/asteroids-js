@@ -37,8 +37,6 @@ define(
   Game.prototype.start = function(startTime) {
     this.time = startTime;
     this.startLevel();
-
-    this.missiles.push(Missile.create(this).init(200, 200, 0, 0, 0));
   };
 
   Game.prototype.stepAndWrap = function(ent) {
@@ -217,6 +215,8 @@ define(
     return this.lives == 0 && this.ship == null;
   };
 
+  // TOOD: I think we can actually combine all missile and bullet logic in the game class,
+  // if we let bullets use a bounding circle instead of points.
   Game.prototype.spawnBullet = function(x, y, velx, vely, dir) {
     this.bullets.push(Bullet.create(this).init(x, y, velx, vely, dir));
   };
@@ -224,6 +224,11 @@ define(
   Game.prototype.spawnAsteroid = function(asteroid) {
     this.asteroids.push(asteroid);
     asteroid.spawner = this;
+  };
+
+  Game.prototype.spawnMissile = function(x, y, velx, vely, dir) {
+    this.missiles.push(
+        Missile.create(this).init(x, y, velx, vely, dir));
   };
 
   return Game;

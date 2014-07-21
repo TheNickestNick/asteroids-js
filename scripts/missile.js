@@ -7,17 +7,23 @@ define(['./gfx', './entity', './meshes'], function(gfx, Entity, meshes) {
     this.r = direction;
     this.velx = velx - Math.sin(this.r) * Missile.ACCELERATION;
     this.vely = vely + Math.cos(this.r) * Missile.ACCELERATION;
-    this.ttl = 50;
+    this.ttl = 70;
+    this.boundingRadius = 5;
     return this;
   };
 
-  Missile.ACCELERATION = 0.8;
+  Missile.ACCELERATION = 1.0;
+  Missile.MAX_VELOCITY = 20;
 
   Missile.prototype.onStep = function() {
-    if (this.velx * this.velx + this.vely + this.vely < 50) {
-      this.velx += Math.sin(this.r) * Missile.ACCELERATION;
+    if (this.velx * this.velx + this.vely * this.vely < Missile.MAX_VELOCITY * Missile.MAX_VELOCITY) {
+      this.velx -= Math.sin(this.r) * Missile.ACCELERATION;
       this.vely += Math.cos(this.r) * Missile.ACCELERATION;
     }
+
+    var path = Math.sin(this.aliveTime * 0.4) * 4;
+    this.x += Math.cos(this.r) * path;
+    this.y += Math.sin(this.r) * path;
   };
 
   Missile.WIDTH = 8;

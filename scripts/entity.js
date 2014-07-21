@@ -15,6 +15,7 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.velr = 0;
     this.ttl = null;
     this.dead = false;
+    // TODO: rename to just "time"
     this.aliveTime = 0;
     this.spawner = spawner;
   }

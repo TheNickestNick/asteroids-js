@@ -8,6 +8,7 @@ define(['./meshes', './entity', './audio'], function(meshes, Entity, audio) {
     this.thrusting = false;
     this.shooting = false;
     this.timeUntilShot = 0;
+    this.nextMissileTime = 0;
     this.boundingRadius = 10;
     this.cannonReloadTime = Ship.TIME_BETWEEN_SHOTS;
     this.cannonRecoil = Ship.SHOT_RECOIL;
@@ -19,7 +20,8 @@ define(['./meshes', './entity', './audio'], function(meshes, Entity, audio) {
 
   Ship.RESPAWN_INVINCIBILITY_TIME = 80;
   Ship.ROTATION_SPEED = 0.1;
-  Ship.TIME_BETWEEN_SHOTS = 8;
+  Ship.TIME_BETWEEN_SHOTS = 8; // TODO: cannon_reload_time
+  Ship.MISSILE_RELOAD_TIME = 20;
   Ship.SHOT_RECOIL = 0.2;
   Ship.ACCELERATION = 0.25;
 
@@ -107,6 +109,11 @@ define(['./meshes', './entity', './audio'], function(meshes, Entity, audio) {
       }
 
       audio.play(audio.sounds.shoot2);
+    }
+
+    if (this.shooting && this.nextMissileTime < this.aliveTime) {
+      this.spawner.spawnMissile(this.x, this.y, this.velx, this.vely, this.r);
+      this.nextMissileTime = this.aliveTime + Ship.MISSILE_RELOAD_TIME;
     }
 
     this.timeUntilShot -= 1;
