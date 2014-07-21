@@ -7,14 +7,17 @@ define(['./gfx', './entity', './meshes'], function(gfx, Entity, meshes) {
     this.r = direction;
     this.velx = velx - Math.sin(this.r) * Missile.ACCELERATION;
     this.vely = vely + Math.cos(this.r) * Missile.ACCELERATION;
+    this.ttl = 50;
     return this;
   };
 
-  Missile.ACCELERATION = 0;//0.01;
+  Missile.ACCELERATION = 0.8;
 
   Missile.prototype.onStep = function() {
-    this.velx += Math.sin(this.r) * Missile.ACCELERATION;
-    this.vely += Math.cos(this.r) * Missile.ACCELERATION;
+    if (this.velx * this.velx + this.vely + this.vely < 50) {
+      this.velx += Math.sin(this.r) * Missile.ACCELERATION;
+      this.vely += Math.cos(this.r) * Missile.ACCELERATION;
+    }
   };
 
   Missile.WIDTH = 8;
@@ -25,8 +28,9 @@ define(['./gfx', './entity', './meshes'], function(gfx, Entity, meshes) {
     ctx.translate(this.x, this.y);
     ctx.rotate(this.r);
 
-    ctx.scale(4, 4);
+    ctx.scale(1.2, 1.2);
 
+    ctx.translate(0, -8);
     ctx.save();
     ctx.beginPath();
     gfx.circle(ctx, -3, -5, 3.5);
@@ -61,8 +65,8 @@ define(['./gfx', './entity', './meshes'], function(gfx, Entity, meshes) {
     ctx.restore();
 
     ctx.save();
-    ctx.translate(0, -3);
-    ctx.scale(0.4, 1);
+    ctx.translate(0, 25);
+    ctx.scale(0.4, 5);
     meshes.thrust.draw(ctx);
     ctx.restore();
   };
