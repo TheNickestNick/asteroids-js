@@ -29,6 +29,15 @@ define(['./entity','./textures'], function(Entity, textures) {
       this.v += this.velv;
     },
 
+    onDie: function() {
+      if (this.size > 1) {
+        this.spawner.spawnAsteroid(
+            Asteroid.create().init(this.x, this.y, Math.random(), Math.random(), this.size - 1)); 
+        this.spawner.spawnAsteroid(
+            Asteroid.create().init(this.x, this.y, Math.random(), Math.random(), this.size - 1)); 
+      }
+    },
+
     draw: function(graphics) {
       var self = this;
       graphics.withContext(function(context) {

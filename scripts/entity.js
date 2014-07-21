@@ -1,6 +1,8 @@
 define(['./pooled', './debug'], function(pooled, debug) {
   debug.define('draw_bounds', false);
 
+  function abstract() {}
+
   function Entity(spawner) {
     this.x = 0;
     this.y = 0;
@@ -42,7 +44,11 @@ define(['./pooled', './debug'], function(pooled, debug) {
 
   Entity.prototype.die = function() {
     this.dead = true;
+    this.onDie();
   };
+
+  // TODO: should we do this with all of the other overrides?
+  Entity.prototype.onDie = abstract;
 
   Entity.prototype.update = function() {
     this.updatePosition();
@@ -79,7 +85,7 @@ define(['./pooled', './debug'], function(pooled, debug) {
     constructor.prototype.constructor = constructor;
 
     for (var k in defn) {
-      if (!(k in constructor.prototype)) {
+      if (!(k in constructor.prototype) || constructor.prototype[k] === abstract) {
         constructor.prototype[k] = defn[k];
       }
     }

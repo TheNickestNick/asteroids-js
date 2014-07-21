@@ -20,12 +20,10 @@ define(
     this.bullets = [];
     this.fx = [];
     this.asteroids = [];
-
-    this.ships = [];
-    this.entities = [this.ships, this.bullets, this.fx, this.asteroids];
+    // TODO: somehow make ship part of this
+    this.entities = [this.bullets, this.fx, this.asteroids];
 
     this.respawnIn = null;
-
     this.quadtree = new Quadtree(0, 0, width, height, 3);
   };
 
@@ -37,13 +35,9 @@ define(
     this.ship = Ship.create(this).init(this.width / 2, this.height / 2);
     for (var i = 0; i < 10; i++) {
       this.asteroids.push(
-        Asteroid.create().init(Math.random() * this.width, Math.random() * this.height,
+        Asteroid.create(this).init(Math.random() * this.width, Math.random() * this.height,
           Math.random(), Math.random()));
     }
-  };
-
-  Game.prototype.forAllEntities = function(fn) {
-    
   };
 
   Game.prototype.updateAndWrap = function(ent) {
@@ -97,19 +91,8 @@ define(
       
       if (hit && hit.constructor == Asteroid) {
         hit.die();
-        b.free();
-        array.remove(this.bullets, i);
-        i--;
-
+        b.die();
         this.points += 10 * hit.size;
-        // TODO: move this into the asteroid class so that we can have different behaviors.
-        if (hit.size > 1) {
-          this.asteroids.push(
-              Asteroid.create().init(hit.x, hit.y, Math.random(), Math.random(), hit.size-1));
-          this.asteroids.push(
-              Asteroid.create().init(hit.x, hit.y, Math.random(), Math.random(), hit.size-1));
-        }
-
         this.fx.push(Explosion.create().init(hit.x, hit.y, 5));
         this.fx.push(Explosion.create().init(b.x, b.y, 5));
       }
@@ -121,15 +104,15 @@ define(
 
   Game.prototype.stepShip = function() {
     if (!this.ship || !this.ship.isAlive()) {
-      // TODO: generalize the concept of a timer, or at least "in X steps, I want Y to happen"
-      if (this.respawnIn > 0) {
-        this.respawnIn--;
-      }
-
       if (this.respawnIn == 0) {
         this.lives--;
         this.ship = Ship.create(this).init(this.width / 2, this.height / 2);
         this.respawnIn = null;
+      }
+
+      // TODO: generalize the concept of a timer, or at least "in X steps, I want Y to happen"
+      if (this.respawnIn > 0) {
+        this.respawnIn--;
       }
 
       return;
@@ -231,7 +214,12 @@ define(
   };
 
   Game.prototype.spawnBullet = function(x, y, velx, vely, dir) {
-    this.bullets.push(Bullet.create().init(x, y, velx, vely, dir));
+    this.bullets.push(Bullet.create(this).init(x, y, velx, vely, dir));
+  };
+
+  Game.prototype.spawnAsteroid = function(asteroid) {
+    this.asteroids.push(asteroid);
+    asteroid.spawner = this;
   };
 
   return Game;
