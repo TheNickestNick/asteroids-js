@@ -1,5 +1,5 @@
 define(function() {
-  var Keys = { SPACE: 32, RIGHT: 37, UP: 38, LEFT: 39, DOWN: 40 };
+  var Keys = { SPACE: 32, RIGHT: 37, UP: 38, LEFT: 39, DOWN: 40, F: 70 };
 
   var input = {};
   input.init = function(game) {
@@ -20,7 +20,7 @@ define(function() {
   //TODO: these should not be interacting with game.ship directly!
   input.keyPress = function(event) {
     if (event.which == Keys.SPACE) {
-      this.game.ship.shoot(true);
+      this.game.ship.startFiring();
     }
     else if (event.which == Keys.RIGHT) {
       this.game.ship.turn(-1);
@@ -29,7 +29,10 @@ define(function() {
       this.game.ship.turn(1);
     }
     else if (event.which == Keys.UP) {
-      this.game.ship.thrust(true);
+      this.game.ship.engageThrust();
+    }
+    else if (event.which == Keys.F) {
+      this.game.ship.launchMissile(); 
     }
   }
 
@@ -37,7 +40,7 @@ define(function() {
     this.pressed[event.which] = false;
 
     if (event.which == Keys.SPACE) {
-      this.game.ship.shoot(false);
+      this.game.ship.stopFiring();
     }
     else if (event.which == Keys.RIGHT) {
       this.game.ship.turn(1);
@@ -46,7 +49,7 @@ define(function() {
       this.game.ship.turn(-1);
     }
     else if (event.which == Keys.UP) {
-      this.game.ship.thrust(false);
+      this.game.ship.disengageThrust();
     }
   };
 

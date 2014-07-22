@@ -1,4 +1,5 @@
-define(['./gfx', './entity', './meshes'], function(gfx, Entity, meshes) {
+define(['./gfx', './entity', './meshes', './utils', './explosion2'], 
+    function(gfx, Entity, meshes, utils, Explosion2) {
   var Missile = Entity.subclass();
 
   Missile.prototype.init = function(x, y, velx, vely, direction) {
@@ -9,6 +10,7 @@ define(['./gfx', './entity', './meshes'], function(gfx, Entity, meshes) {
     this.vely = vely + Math.cos(this.r) * Missile.ACCELERATION;
     this.ttl = 70;
     this.boundingRadius = 5;
+    this.path = utils.random(-3, 3);
     return this;
   };
 
@@ -21,9 +23,13 @@ define(['./gfx', './entity', './meshes'], function(gfx, Entity, meshes) {
       this.vely += Math.cos(this.r) * Missile.ACCELERATION;
     }
 
-    var path = Math.sin(this.aliveTime * 0.4) * 4;
+    var path = Math.sin(this.aliveTime * 0.4) * this.path;
     this.x += Math.cos(this.r) * path;
     this.y += Math.sin(this.r) * path;
+  };
+
+  Missile.prototype.onDie = function() {
+    this.spawner.spawnFx(Explosion2.create().init(this.x, this.y));
   };
 
   Missile.WIDTH = 8;
@@ -34,7 +40,7 @@ define(['./gfx', './entity', './meshes'], function(gfx, Entity, meshes) {
     ctx.translate(this.x, this.y);
     ctx.rotate(this.r);
 
-    ctx.scale(1.2, 1.2);
+    ctx.scale(0.8, 0.8);
 
     ctx.translate(0, -8);
     ctx.save();

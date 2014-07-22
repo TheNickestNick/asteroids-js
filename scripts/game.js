@@ -1,8 +1,8 @@
 define(
     ['./ship', './asteroid', './quadtree', './meshes', './array', './explosion', './debug', 
-     './bullet', './hud', './bonus', './audio', './missile'], 
+     './bullet', './hud', './bonus', './audio', './missile', './explosion2'], 
     function(Ship, Asteroid, Quadtree, meshes, array, Explosion, debug, Bullet, hud, Bonus, 
-             audio, Missile) {
+             audio, Missile, Explosion2) {
   debug.define('pause', false);
   debug.define('pause_step', 0);
   debug.define('draw_quadtree', false);
@@ -32,11 +32,13 @@ define(
 
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
   Game.SHIP_RESPAWN_TIME = 60;
-  Game.BONUS_SPAWN_CHANCE = 1.2;
+  Game.BONUS_SPAWN_CHANCE = 0.1;
 
   Game.prototype.start = function(startTime) {
     this.time = startTime;
     this.startLevel();
+
+    this.fx.push(Explosion2.create(this).init(100, 100));
   };
 
   Game.prototype.stepAndWrap = function(ent) {
@@ -229,6 +231,11 @@ define(
   Game.prototype.spawnMissile = function(x, y, velx, vely, dir) {
     this.missiles.push(
         Missile.create(this).init(x, y, velx, vely, dir));
+  };
+
+
+  Game.prototype.spawnFx = function(fx) {
+    this.fx.push(fx);
   };
 
   return Game;

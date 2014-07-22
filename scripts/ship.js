@@ -6,7 +6,7 @@ define(['./meshes', './entity', './audio'], function(meshes, Entity, audio) {
     this.y = y;
     this.turning = 0;
     this.thrusting = false;
-    this.shooting = false;
+    this.firing = false;
     this.timeUntilShot = 0;
     this.nextMissileTime = 0;
     this.boundingRadius = 10;
@@ -55,12 +55,17 @@ define(['./meshes', './entity', './audio'], function(meshes, Entity, audio) {
     }
   };
 
-  Ship.prototype.thrust = function(thrusting) {
-    this.thrusting = thrusting;
-  };
+  Ship.prototype.engageThrust = function() { this.thrusting = true; };
+  Ship.prototype.disengageThrust = function() { this.thrusting = false; };
 
-  Ship.prototype.shoot = function(shooting) {
-    this.shooting = shooting;
+  Ship.prototype.startFiring = function() { this.firing = true; }
+  Ship.prototype.stopFiring = function() { this.firing = false; }
+
+  Ship.prototype.launchMissile = function() {
+    if (this.nextMissileTime < this.aliveTime) {
+      this.spawner.spawnMissile(this.x, this.y, this.velx, this.vely, this.r);
+      this.nextMissileTime = this.aliveTime + Ship.MISSILE_RELOAD_TIME;
+    }
   };
 
   Ship.prototype.turn = function(direction) {
@@ -96,7 +101,7 @@ define(['./meshes', './entity', './audio'], function(meshes, Entity, audio) {
       this.vely = 0;
     }
 
-    if (this.shooting && this.timeUntilShot <= 0) {
+    if (this.firing && this.timeUntilShot <= 0) {
       this.timeUntilShot = this.cannonReloadTime;
 
       if (this.cannons == 1 || this.cannons == 3) {
@@ -109,11 +114,6 @@ define(['./meshes', './entity', './audio'], function(meshes, Entity, audio) {
       }
 
       audio.play(audio.sounds.shoot2);
-    }
-
-    if (this.shooting && this.nextMissileTime < this.aliveTime) {
-      this.spawner.spawnMissile(this.x, this.y, this.velx, this.vely, this.r);
-      this.nextMissileTime = this.aliveTime + Ship.MISSILE_RELOAD_TIME;
     }
 
     this.timeUntilShot -= 1;
