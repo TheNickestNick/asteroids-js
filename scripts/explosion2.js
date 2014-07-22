@@ -11,6 +11,10 @@ define(['./entity', './gfx'], function(Entity, gfx) {
     return this;
   };
 
+  Explosion2.prototype.onStep = function() {
+    this.boundingRadius = (this.aliveTime / this.duration) * this.radius;
+  };
+
   Explosion2.prototype.onDraw = function(ctx) {
     this.circle(ctx, 'red', 0);
     this.circle(ctx, 'orange', 0.2);

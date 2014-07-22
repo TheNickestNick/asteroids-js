@@ -3,10 +3,10 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
 
   function abstract() {}
 
-  // REFACTORING IDEA:
-  //  Don't allow any overrides at all. Have abstract "onX" methods that get called from
-  //  the base entity methods.
-  function Entity(spawner) {
+  // TODO: can we somehow get rid of the silly .create().init(x, y, z) nonesenese?
+  // Maybe we can make the entities a function that does the create and init underneath?
+  // You would call it wihout new, like: Missile(x, y, dir) or Bullet(x, y, dir)
+  function Entity() {
     this.x = 0;
     this.y = 0;
     this.r = 0;
@@ -17,7 +17,6 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.dead = false;
     // TODO: rename to just "time"
     this.aliveTime = 0;
-    this.spawner = spawner;
   }
 
   Entity.prototype.onDie = abstract;
@@ -50,6 +49,10 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     }
   };
 
+  Entity.prototype.spawn = function(entity) {
+    this.spawner.spawn(entity);
+  };
+  
   Entity.prototype.die = function() {
     this.dead = true;
     this.onDie();

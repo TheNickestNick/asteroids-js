@@ -6,6 +6,7 @@ define(
   debug.define('pause', false);
   debug.define('pause_step', 0);
   debug.define('draw_quadtree', false);
+  debug.define('step_time', null);
 
   // TODO: we need the concept of a Player at some point.
   var Game = function(width, height) {
@@ -18,13 +19,15 @@ define(
     this.level = 1;
 
     this.ship = null;
-    this.bullets = [];
+    this.projectiles = [];
     this.fx = [];
     this.asteroids = [];
     this.bonuses = [];
     this.missiles = [];
+    this.explosions = [];
     // TODO: somehow make ship part of this
-    this.entities = [this.bullets, this.missiles, this.asteroids, this.fx, this.bonuses];
+    this.entities = [this.projectiles, this.missiles, this.asteroids, this.fx, this.bonuses, 
+        this.explosions];
 
     this.respawnIn = null;
     this.quadtree = new Quadtree(0, 0, width, height, 3);
@@ -37,8 +40,6 @@ define(
   Game.prototype.start = function(startTime) {
     this.time = startTime;
     this.startLevel();
-
-    this.fx.push(Explosion2.create(this).init(100, 100));
   };
 
   Game.prototype.stepAndWrap = function(ent) {
@@ -82,17 +83,22 @@ define(
 
   Game.prototype.startLevel = function() {
     if (this.ship === null) {
-      this.ship = Ship.create(this).init(this.width / 2, this.height / 2);
+      this.ship = Ship.create().init(this.width / 2, this.height / 2);
+      this.ship.spawner = this;
     }
     else {
       this.ship.respawn(this.width/2, this.height/2);
     }
 
     for (var i = 0; i < this.level; i++) {
-      this.asteroids.push(
-          Asteroid.create(this).init(Math.random() * this.width, Math.random() * this.height,
+      this.spawn(Asteroid.create().init(Math.random() * this.width, Math.random() * this.height,
               Math.random(), Math.random()));
     }
+  };
+
+  Game.prototype.onExplosionHit = function(explosion, hit) {
+    hit.die(); 
+    this.spawn(Explosion2.create().init(hit.x, hit.y, hit.size * 10));
   };
 
   // TODO: audit the order of these updates.
@@ -103,23 +109,27 @@ define(
     this.quadtree.addAll(this.bonuses);
     this.stepShip();
 
-    for (var i = 0; i < this.bullets.length; i++) {
-      var b = this.bullets[i];
-      var hit = this.quadtree.findFirstIsecWithPoint(b.x, b.y);
+    for (var i = 0; i < this.projectiles.length; i++) {
+      var p = this.projectiles[i];
+      var hit = this.quadtree.findFirstIsecWith(p);
       
-      if (hit && hit.constructor == Asteroid) {
+      if (hit && hit.constructor === Asteroid) {
         hit.die();
-        b.die();
+        p.die();
         this.points += 10 * hit.size;
         this.xp += 10;
-        this.fx.push(Explosion.create().init(hit.x, hit.y, 5));
-        this.fx.push(Explosion.create().init(b.x, b.y, 5));
 
-        // TODO: push into asteroid class?
-        if (Math.random() < Game.BONUS_SPAWN_CHANCE) {
-          this.bonuses.push(Bonus.create(this).init(hit.x, hit.y));
+        if (p.constructor === Bullet) {
+          this.spawn(Explosion.create().init(hit.x, hit.y, 5));
+          this.spawn(Explosion.create().init(p.x, p.y, 5));
         }
       }
+    }
+
+    // TODO: can we somehow consolidate the explosion and projectile handling? It's very similar.
+    for (var i = 0; i < this.explosions.length; i++) {
+      var e = this.explosions[i];
+      this.quadtree.forEachIntersection(e, this.onExplosionHit, this);
     }
 
     this.purgeDead();
@@ -136,7 +146,8 @@ define(
     if (!this.ship || !this.ship.isAlive()) {
       if (this.respawnIn == 0) {
         this.lives--;
-        this.ship = Ship.create(this).init(this.width / 2, this.height / 2);
+        this.ship = Ship.create().init(this.width / 2, this.height / 2);
+        this.ship.spawner = this;
         this.respawnIn = null;
       }
 
@@ -179,8 +190,9 @@ define(
   };
   
   Game.prototype.runUntil = function(time) {
-    while (this.time + Game.STEP_TIME_MS < time) {
-      this.time += Game.STEP_TIME_MS;
+    var stepTime = debug.vars.step_time || Game.STEP_TIME_MS;
+    while (this.time + stepTime < time) {
+      this.time += stepTime;
 
       if (!debug.vars.pause) { 
         this.step();
@@ -217,25 +229,29 @@ define(
     return this.lives == 0 && this.ship == null;
   };
 
-  // TOOD: I think we can actually combine all missile and bullet logic in the game class,
-  // if we let bullets use a bounding circle instead of points.
-  Game.prototype.spawnBullet = function(x, y, velx, vely, dir) {
-    this.bullets.push(Bullet.create(this).init(x, y, velx, vely, dir));
-  };
+  Game.prototype.spawn = function(ent) {
+    if (ent.constructor === Asteroid) {
+      this.asteroids.push(ent);
+    }
+    else if (ent.constructor === Explosion2) {
+      this.explosions.push(ent);
+    }
+    else if (ent.constructor === Bullet) {
+      this.projectiles.push(ent);
+    }
+    else if (ent.constructor === Missile) {
+      this.projectiles.push(ent);
+    }
+    else if (ent.constructor === Bonus) {
+      this.bonuses.push(ent);
+    }
+    else {
+      // fx holds all misc entity types that just need to be updated
+      // and don't need special handling
+      this.fx.push(ent);
+    }
 
-  Game.prototype.spawnAsteroid = function(asteroid) {
-    this.asteroids.push(asteroid);
-    asteroid.spawner = this;
-  };
-
-  Game.prototype.spawnMissile = function(x, y, velx, vely, dir) {
-    this.missiles.push(
-        Missile.create(this).init(x, y, velx, vely, dir));
-  };
-
-
-  Game.prototype.spawnFx = function(fx) {
-    this.fx.push(fx);
+    ent.spawner = this;
   };
 
   return Game;

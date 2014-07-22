@@ -1,4 +1,4 @@
-define(['./meshes', './entity', './audio'], function(meshes, Entity, audio) {
+define(['./meshes', './entity', './audio', './missile'], function(meshes, Entity, audio, Missile) {
   var Ship = Entity.subclass();
 
   Ship.prototype.init = function(x, y) {
@@ -63,7 +63,8 @@ define(['./meshes', './entity', './audio'], function(meshes, Entity, audio) {
 
   Ship.prototype.launchMissile = function() {
     if (this.nextMissileTime < this.aliveTime) {
-      this.spawner.spawnMissile(this.x, this.y, this.velx, this.vely, this.r);
+      this.spawn(
+        Missile.create().init(this.x, this.y, this.velx, this.vely, this.r));
       this.nextMissileTime = this.aliveTime + Ship.MISSILE_RELOAD_TIME;
     }
   };
@@ -84,7 +85,7 @@ define(['./meshes', './entity', './audio'], function(meshes, Entity, audio) {
     dirOffset = dirOffset || 0;
     var spread = 0.1;
     var bdir = this.r + dirOffset + (Math.random()*spread - (spread/2));
-    this.spawner.spawnBullet(this.x, this.y, this.velx, this.vely, bdir);
+    this.spawn(Bullet.create().init(this.x, this.y, this.velx, this.vely, bdir));
 
     // recoil
     this.velx += Math.sin(bdir) * this.cannonRecoil;

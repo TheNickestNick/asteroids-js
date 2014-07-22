@@ -29,10 +29,16 @@ define(['./entity','./textures', './utils', './gfx'], function(Entity, textures,
     this.v += this.velv;
   };
 
+  Asteroid.BONUS_SPAWN_CHANCE = 0.05;
+
   Asteroid.prototype.onDie = function() {
     if (this.size > 1) {
       this.spawnChild();
       this.spawnChild();
+    }
+
+    if (Math.random() < Asteroid.BONUS_SPAWN_CHANCE) {
+      this.spawn(Bonus.create().init(this.x, this.y));
     }
   };
 
@@ -47,9 +53,10 @@ define(['./entity','./textures', './utils', './gfx'], function(Entity, textures,
   };
 
   Asteroid.prototype.spawnChild = function() {
-    this.spawner.spawnAsteroid(
-        Asteroid.create().init(
-            this.x, this.y, utils.random(-1, 1), utils.random(-1, 1), this.size - 1)); 
+    var xoff = utils.random(-10, 10);
+    var yoff = utils.random(-10, 10);
+    this.spawn(Asteroid.create().init(
+        this.x + xoff, this.y + yoff, utils.random(-1, 1), utils.random(-1, 1), this.size - 1)); 
   };
 
   return Asteroid;

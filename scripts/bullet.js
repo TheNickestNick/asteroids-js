@@ -9,6 +9,7 @@ define(['./entity', './gfx'], function(Entity, gfx) {
     this.velx = velx - Math.sin(direction) * Bullet.VELOCITY;
     this.vely = vely + Math.cos(direction) * Bullet.VELOCITY;
     this.ttl = Bullet.TTL;
+    this.boundingRadius = 0;
     return this;
   };
 

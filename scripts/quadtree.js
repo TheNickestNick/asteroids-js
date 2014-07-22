@@ -53,6 +53,34 @@ define(['./geometry'], function(geometry) {
     this.eachChild(Quadtree.prototype.add, object);
   };
 
+  // I'm using a callback here to save an array allocation. Is this really necessary though?
+  // How bad is allocating that array? I could actually pass the array in instead of the
+  // callback, and just cache the array, clearing it prior to passing it here.
+  Quadtree.prototype.forEachIntersection = function(obj, callback, scope) {
+    if (!this.aabb.intersectsCircle(obj.x, obj.y, obj.boundingRadius)) {
+      return;
+    };
+
+    if (this.children) {
+      for (var i = 0; i < this.children.length; i++) {
+        this.children[i].forEachIntersection(obj, callback, scope);
+      }
+    }
+
+    if (this.objects) {
+      for (var i = 0; i < this.objects.length; i++) {
+        var o = this.objects[i];
+        // TODO: should Entity contain bounds checking logic like this?
+        if (o.isAlive() && geometry.circlesIntersect(o.x, o.y, o.boundingRadius, 
+                                                     obj.x, obj.y, obj.boundingRadius)) {
+          // TODO: determine whether using .call is OK from a GC point of view. Should
+          // I be caching a pre-bound function and passing that in instead?
+          callback.call(scope, obj, o);
+        }
+      }
+    }
+  };
+
   Quadtree.prototype.findFirstIsecWithPoint = function(x, y) {
     if (!this.aabb.containsPoint(x, y)) {
       return null;

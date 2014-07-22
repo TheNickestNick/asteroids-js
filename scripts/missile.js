@@ -29,7 +29,7 @@ define(['./gfx', './entity', './meshes', './utils', './explosion2'],
   };
 
   Missile.prototype.onDie = function() {
-    this.spawner.spawnFx(Explosion2.create().init(this.x, this.y));
+    this.spawn(Explosion2.create().init(this.x, this.y, 40));
   };
 
   Missile.WIDTH = 8;
