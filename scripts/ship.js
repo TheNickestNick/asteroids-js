@@ -1,4 +1,5 @@
-define(['./meshes', './entity', './audio', './missile'], function(meshes, Entity, audio, Missile) {
+define(['./meshes', './entity', './audio', './missile', './bomb', './explosion'], 
+    function(meshes, Entity, audio, Missile, Bomb, Explosion) {
   var Ship = Entity.subclass();
 
   Ship.prototype.init = function(x, y) {
@@ -14,6 +15,7 @@ define(['./meshes', './entity', './audio', './missile'], function(meshes, Entity
     this.cannonRecoil = Ship.SHOT_RECOIL;
     this.cannons = 1;
     this.brakes = false;
+    this.bomb = null;
     this.makeInvincible(Ship.RESPAWN_INVINCIBILITY_TIME);
     return this;
   };
@@ -55,6 +57,14 @@ define(['./meshes', './entity', './audio', './missile'], function(meshes, Entity
     }
   };
 
+  Ship.prototype.onDie = function() {
+    if (this.bomb !== null) {
+      this.bomb.die();
+    }
+    
+    this.spawn(Explosion.create().init(this.x, this.y, 100, 70));
+  };
+
   Ship.prototype.engageThrust = function() { this.thrusting = true; };
   Ship.prototype.disengageThrust = function() { this.thrusting = false; };
 
@@ -66,6 +76,17 @@ define(['./meshes', './entity', './audio', './missile'], function(meshes, Entity
       this.spawn(
         Missile.create().init(this.x, this.y, this.velx, this.vely, this.r));
       this.nextMissileTime = this.aliveTime + Ship.MISSILE_RELOAD_TIME;
+    }
+  };
+
+  Ship.prototype.dropOrDetonateBomb = function() {
+    if (this.bomb !== null) {
+      this.bomb.detonate();
+      this.bomb = null;
+    }
+    else {
+      this.bomb = Bomb.create().init(this.x, this.y, this.velx, this.vely);
+      this.spawn(this.bomb);
     }
   };
 

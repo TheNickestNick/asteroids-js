@@ -1,5 +1,5 @@
 define(function() {
-  var Keys = { SPACE: 32, RIGHT: 37, UP: 38, LEFT: 39, DOWN: 40, F: 70 };
+  var Keys = { SPACE: 32, RIGHT: 37, UP: 38, LEFT: 39, DOWN: 40, F: 70, B: 66 };
 
   var input = {};
   input.init = function(game) {
@@ -33,6 +33,9 @@ define(function() {
     }
     else if (event.which == Keys.F) {
       this.game.ship.launchMissile(); 
+    }
+    else if (event.which == Keys.B) {
+      this.game.ship.dropOrDetonateBomb();
     }
   }
 

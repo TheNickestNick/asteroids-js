@@ -68,13 +68,9 @@ define(
         var ent = set[j];
         // TODO: make this part of stepAndWrap somehow?
         if (!ent.isAlive()) {
+          ent.free();
           array.remove(set, j);
           j--;
-
-          // TODO: hack, remove
-          if (typeof ent.free == 'function') {
-            ent.free();
-          }
         }
       }
     }
@@ -120,8 +116,8 @@ define(
         this.points += 10 * hit.size;
 
         if (p.constructor === Bullet) {
-          this.spawn(Explosion.create().init(hit.x, hit.y, 5));
-          this.spawn(Explosion.create().init(p.x, p.y, 5));
+          this.spawn(Explosion2.create().init(p.x, p.y, 10, null, true));
+          //this.spawn(Explosion2.create().init(p.x, p.y, null, null, true));
         }
       }
     }
@@ -165,7 +161,6 @@ define(
     var hit = this.quadtree.findFirstIsecWith(this.ship);
     if (hit) {
       if (hit.constructor == Asteroid && !this.ship.invincible()) {
-        this.fx.push(Explosion.create().init(this.ship.x, this.ship.y, 100, 70));
         // TODO: Can we consolidate dying and freeing?
         // Also, can we move the explosing spawning into the entity classes?
         this.ship.die();
