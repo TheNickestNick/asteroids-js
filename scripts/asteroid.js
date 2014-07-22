@@ -1,4 +1,5 @@
-define(['./entity','./textures', './utils', './gfx'], function(Entity, textures, utils, gfx) {
+define(['./entity','./textures', './utils', './gfx', './bonus'], 
+    function(Entity, textures, utils, gfx, Bonus) {
   var asteroidTextures = ['rock1', 'rock2', 'rock3', 'rock4'];
   var Asteroid = Entity.subclass();
 
@@ -20,7 +21,7 @@ define(['./entity','./textures', './utils', './gfx'], function(Entity, textures,
     this.size = size || 4;
 
     // TODO: maybe make this a method?
-    this.boundingRadius = this.size * 7;
+    this.boundingRadius = this.size * 10;
     return this;
   };
 
@@ -53,6 +54,7 @@ define(['./entity','./textures', './utils', './gfx'], function(Entity, textures,
   };
 
   Asteroid.prototype.spawnChild = function() {
+    // TODO: make these circular, cuz right now they're square.
     var xoff = utils.random(-10, 10);
     var yoff = utils.random(-10, 10);
     this.spawn(Asteroid.create().init(

@@ -15,7 +15,6 @@ define(
     this.time = 0;
     this.points = 0;
     this.lives = 2;
-    this.xp = 0;
     this.level = 1;
 
     this.ship = null;
@@ -97,8 +96,10 @@ define(
   };
 
   Game.prototype.onExplosionHit = function(explosion, hit) {
-    hit.die(); 
-    this.spawn(Explosion2.create().init(hit.x, hit.y, hit.size * 10));
+    if (hit.constructor === Asteroid) {
+      hit.die(); 
+      this.spawn(Explosion2.create().init(hit.x, hit.y, hit.size * 10, null, true));
+    }
   };
 
   // TODO: audit the order of these updates.
@@ -117,7 +118,6 @@ define(
         hit.die();
         p.die();
         this.points += 10 * hit.size;
-        this.xp += 10;
 
         if (p.constructor === Bullet) {
           this.spawn(Explosion.create().init(hit.x, hit.y, 5));
@@ -233,7 +233,7 @@ define(
     if (ent.constructor === Asteroid) {
       this.asteroids.push(ent);
     }
-    else if (ent.constructor === Explosion2) {
+    else if (ent.constructor === Explosion2 && !ent.animationOnly()) {
       this.explosions.push(ent);
     }
     else if (ent.constructor === Bullet) {

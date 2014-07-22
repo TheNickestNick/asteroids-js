@@ -2,17 +2,22 @@ define(['./entity', './gfx'], function(Entity, gfx) {
   // TODO: rehtink the naming and structure of the explosion classes
   var Explosion2 = Entity.subclass();
 
-  Explosion2.prototype.init = function(x, y, radius) {
+  Explosion2.prototype.init = function(x, y, radius, duration, animationOnly) {
     this.x = x;
     this.y = y;
-    this.duration = 7;
+    this.duration = duration || 8;
     this.ttl = this.duration;
-    this.radius = radius || 70;
+    this.radius = radius || 50;
+    this.animateOnly = !!animationOnly;
     return this;
   };
 
   Explosion2.prototype.onStep = function() {
     this.boundingRadius = (this.aliveTime / this.duration) * this.radius;
+  };
+
+  Explosion2.prototype.animationOnly = function() {
+    return this.animateOnly;
   };
 
   Explosion2.prototype.onDraw = function(ctx) {
