@@ -23,6 +23,7 @@ define(['./meshes'], function(meshes) {
       ctx.fillText(game.points, game.width - textSize.width - 8, 58);
       ctx.restore();
 
+      /** old XP bar stuff
       ctx.save();
       ctx.beginPath();
       ctx.rect(10, 10, 300, 15);
@@ -37,6 +38,7 @@ define(['./meshes'], function(meshes) {
       ctx.fillStyle = 'green';
       ctx.fill();
       ctx.restore();
+      end XP bar stuff**/
 
       if (game.over()) {
         ctx.save();
