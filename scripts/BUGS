@@ -1,3 +1,4 @@
+Ship velocity is not reset when respawning.
 Need to layer objects when drawing.
 Explosion2s do not wrap across edges of screen.
 Objects at edge of screen do not render across edge.

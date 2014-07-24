@@ -6,10 +6,10 @@ define(['./entity', './gfx'], function(Entity, gfx) {
     this.x = x;
     this.y = y;
     this.duration = duration || 8;
-    this.ttl = this.duration + delay;
     this.radius = radius || 50;
     this.animateOnly = !!animationOnly;
     this.delay = delay || 0;
+    this.ttl = this.duration + this.delay;
     return this;
   };
 

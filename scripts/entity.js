@@ -58,10 +58,9 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
   };
   
   Entity.prototype.die = function() {
-    if (!this.dead) {
-      this.onDie();
+    if (!this.dead && this.onDie() !== false) {
+      this.dead = true;
     }
-    this.dead = true;
   };
 
   Entity.prototype.step = function() {

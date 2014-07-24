@@ -118,7 +118,9 @@ define(
     }
 
     if (this.ship !== null && !this.ship.isAlive()) {
-      this.respawnIn = Game.SHIP_RESPAWN_TIME;
+      if (this.lives > 0) {
+        this.respawnIn = Game.SHIP_RESPAWN_TIME;
+      }
       this.ship = null;
     }
 

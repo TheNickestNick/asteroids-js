@@ -11,10 +11,12 @@ define(['./gfx', './utils', './entity', './explosion2'],
   };
 
   Bomb.prototype.detonate = function() {
-    for (var i = 0; i < 20; i++) {
+    for (var i = 0; i < 15; i++) {
+      // TODO: the x/y coords are boxy, they need to be circley.
       this.spawn(Explosion2.create().init(
-          this.x + utils.random(-60, 60), this.y + utils.random(-60, 60), 
-          utils.random(30, 50), 20, false, i*4));
+          this.x + utils.random(-100, 100), this.y + utils.random(-100, 100), 
+          // TODO: generate random radii based on circle surface area not radii length
+          utils.random(60, 100), utils.random(6, 15), false, utils.random(0, i*1.5)));
     }
     this.die();
   };

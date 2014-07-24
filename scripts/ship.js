@@ -31,6 +31,8 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
     this.x = x;
     this.y = y;
     this.r = 0;
+    this.velx = 0;
+    this.vely = 0;
     this.makeInvincible(Ship.RESPAWN_INVINCIBILITY_TIME);
   };
 
@@ -62,12 +64,14 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
   };
 
   Ship.prototype.onCollideWithAsteroid = function(asteroid) {
-    if (!this.invincible()) {
-      this.die();
-    }
+    this.die();
   };
 
   Ship.prototype.onDie = function() {
+    if (this.invincible()) {
+      return false;
+    }
+
     if (this.bomb !== null) {
       this.bomb.die();
     }
