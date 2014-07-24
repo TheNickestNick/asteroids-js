@@ -72,7 +72,7 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
       this.bomb.die();
     }
     
-    this.spawn(Explosion.create().init(this.x, this.y, 100, 70));
+    this.spawn(Explosion.create().init(this.x, this.y, 100, 80));
   };
 
   Ship.prototype.engageThrust = function() { this.thrusting = true; };

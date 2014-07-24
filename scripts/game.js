@@ -35,8 +35,7 @@ define(
 
   Game.prototype.start = function(startTime) {
     this.time = startTime;
-    this.ship = Ship.create().init(this.width / 2, this.height / 2);
-    this.spawn(this.ship);
+    this.respawnIn = 0;
     this.startNextLevel();
   };
 
@@ -85,8 +84,17 @@ define(
         obj2.x, obj2.y, obj2.boundingRadius);
   };
 
-  // TODO: audit the order of these updates.
   Game.prototype.step = function() {
+    if (this.respawnIn === 0) {
+      this.respawnIn = null;
+      this.ship = Ship.create().init(this.width/2, this.height/2);
+      this.spawn(this.ship);
+      this.lives -= 1;
+    }
+    else if (this.respawnIn !== null) {
+      this.respawnIn -= 1;
+    }
+
     // This can change as a result of updates and collisions. Cache the length at the
     // start of the step so that new entities don't get updated prematurely.
     var numObjects = this.gameObjects.length;
@@ -106,6 +114,11 @@ define(
           obj1.onCollision(obj2);
         }
       }
+    }
+
+    if (this.ship !== null && !this.ship.isAlive()) {
+      this.respawnIn = Game.SHIP_RESPAWN_TIME;
+      this.ship = null;
     }
 
     this.purgeDead();
