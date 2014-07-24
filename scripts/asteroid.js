@@ -34,8 +34,8 @@ define(['./entity','./textures', './utils', './gfx', './bonus'],
 
   Asteroid.prototype.onDie = function() {
     if (this.size > 1) {
-      this.spawnChild();
-      this.spawnChild();
+      //this.spawnChild();
+      //this.spawnChild();
     }
 
     if (Math.random() < Asteroid.BONUS_SPAWN_CHANCE) {

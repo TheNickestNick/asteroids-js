@@ -23,6 +23,7 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
   Entity.prototype.onStep = abstract;
   Entity.prototype.onDraw = abstract;
   Entity.prototype.onWrap = abstract;
+  Entity.prototype.onCollision = abstract;
 
   Entity.prototype.setPosition = function(x, y) {
     this.x = x;
