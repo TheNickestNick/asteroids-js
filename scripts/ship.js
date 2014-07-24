@@ -57,6 +57,16 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
     }
   };
 
+  Ship.prototype.onCollision = function(other) {
+    other.onCollideWithShip(this);
+  };
+
+  Ship.prototype.onCollideWithAsteroid = function(asteroid) {
+    if (!this.invincible()) {
+      this.die();
+    }
+  };
+
   Ship.prototype.onDie = function() {
     if (this.bomb !== null) {
       this.bomb.die();

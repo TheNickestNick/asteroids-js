@@ -16,8 +16,12 @@ define(['./entity', './gfx'], function(Entity, gfx) {
     this.boundingRadius = (this.aliveTime / this.duration) * this.radius;
   };
 
-  Explosion2.prototype.animationOnly = function() {
-    return this.animateOnly;
+  Explosion2.prototype.onCollideWithAsteroid = function(asteroid) {
+    if (!this.animateOnly) {
+      asteroid.die();
+      this.spawn(Explosion2.create().init(
+          asteroid.x, asteroid.y, asteroid.boundingRadius, null, true /* animateOnly */));
+    }
   };
 
   Explosion2.prototype.onDraw = function(ctx) {

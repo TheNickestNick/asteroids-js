@@ -79,12 +79,12 @@ define(['./entity', './gfx', './utils', './array'], function(Entity, gfx, utils,
     ctx.restore();
   };
 
-  Bonus.prototype.onStep = function() {
-    this.time++;
-  };
-
-  Bonus.prototype.applyTo = function(ship, game) {
-    this.type.apply(ship, game);
+  Bonus.prototype.onCollideWithShip = function(ship) {
+    // TODO: Using spawner like this is a hack, but...
+    // should we just give entities access to the game object anyways? It seems more and
+    // more like they need it.
+    this.type.apply(ship, this.spawner);
+    this.die();
   };
 
   return Bonus;

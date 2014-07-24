@@ -30,11 +30,14 @@ define(['./gfx', './entity', './meshes', './utils', './explosion2'],
 
   Missile.prototype.onDie = function() {
     if (this.ttl === 0) {
-      this.spawn(Explosion2.create().init(this.x, this.y, 100));
+      this.spawn(Explosion2.create().init(this.x, this.y, 60));
     }
-    else {
-      this.spawn(Explosion2.create().init(this.x, this.y, 40));
-    }
+  };
+
+  Missile.prototype.onCollideWithAsteroid = function(asteroid) {
+    this.die();
+    this.spawn(Explosion2.create().init(this.x, this.y, asteroid.boundingRadius));
+    asteroid.die();
   };
 
   Missile.WIDTH = 8;

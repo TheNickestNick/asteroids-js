@@ -17,21 +17,12 @@ define(
     this.time = 0;
     this.points = 0;
     this.lives = 2;
-    this.level = 1;
+    this.level = 0;
 
     this.ship = null;
-    this.projectiles = [];
-    this.fx = [];
-    this.asteroids = [];
-    this.bonuses = [];
-    this.missiles = [];
-    this.explosions = [];
-    // TODO: somehow make ship part of this
-    this.entities = [this.projectiles, this.missiles, this.asteroids, this.fx, this.bonuses, 
-        this.explosions];
-
-    // TODO: rename entities
+    // TODO: rename to entities
     this.gameObjects = [];
+    this.nextLevelIn = null;
 
     this.respawnIn = null;
     this.quadtree = new Quadtree(0, 0, width, height, 3);
@@ -40,10 +31,13 @@ define(
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
   Game.SHIP_RESPAWN_TIME = 60;
   Game.BONUS_SPAWN_CHANCE = 0.1;
+  Game.STEPS_BETWEEN_LEVELS = 100;
 
   Game.prototype.start = function(startTime) {
     this.time = startTime;
-    this.startLevel();
+    this.ship = Ship.create().init(this.width / 2, this.height / 2);
+    this.spawn(this.ship);
+    this.startNextLevel();
   };
 
   Game.prototype.stepAndWrap = function(ent) {
@@ -62,9 +56,12 @@ define(
     }
   };
 
-  Game.prototype.startLevel = function() {
-    this.ship = Ship.create().init(this.width / 2, this.height / 2);
-    this.spawn(this.ship);
+  Game.prototype.startNextLevel = function() {
+    this.level += 1;
+
+    if (this.ship != null) {
+      this.ship.respawn(this.width / 2, this.height / 2);
+    }
 
     for (var i = 0; i < this.level; i++) {
       this.spawn(Asteroid.create().init(Math.random() * this.width, Math.random() * this.height,
@@ -72,26 +69,63 @@ define(
     }
   };
 
+  Game.prototype.isLevelOver = function() {
+    // TODO: there's got to be a constant time way to do this
+    for (var i = 0; i < this.gameObjects.length; i++) {
+      if (this.gameObjects[i].constructor == Asteroid) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  Game.prototype.entitiesIntersect = function(obj1, obj2) {
+    return geometry.circlesIntersect(obj1.x, obj1.y, obj1.boundingRadius,
+        obj2.x, obj2.y, obj2.boundingRadius);
+  };
+
   // TODO: audit the order of these updates.
   Game.prototype.step = function() {
-    for (var i = 0; i < this.gameObjects.length; i++) {
+    // This can change as a result of updates and collisions. Cache the length at the
+    // start of the step so that new entities don't get updated prematurely.
+    var numObjects = this.gameObjects.length;
+  
+    for (var i = 0; i < numObjects; i++) {
       var obj = this.gameObjects[i];
       obj.step();
       obj.wrap(this.width, this.height);
     }
 
-    for (var i = 0; i < this.gameObjects.length; i++) {
-      var obji = this.gameObjects[i];
+    for (var i = 0; i < numObjects; i++) {
+      var obj1 = this.gameObjects[i];
       for (var j = 0; j < this.gameObjects.length; j++) {
-        objj = this.gameObjects[j];
+        obj2 = this.gameObjects[j];
 
-        if (geometry.circlesIntersect(obji, objj)) {
-          obji.onCollision(obj2);
+        if (obj1 != obj2 && this.entitiesIntersect(obj1, obj2)) {
+          obj1.onCollision(obj2);
         }
       }
     }
 
     this.purgeDead();
+
+    if (this.isLevelOver()) {
+      // TODO: we really need to provide a way to genericize this concept
+      if (this.nextLevelIn === null) {
+        this.nextLevelIn = Game.STEPS_BETWEEN_LEVELS;
+      }
+      else {
+        if (this.nextLevelIn === 0) {
+          this.startNextLevel();
+          this.nextLevelIn = null;
+        }
+        else {
+          this.nextLevelIn -= 1;
+        }
+      }
+    }
+
     this.dirty = true;
   };
 
@@ -101,6 +135,8 @@ define(
   
   Game.prototype.runUntil = function(time) {
     var stepTime = debug.vars.step_time || Game.STEP_TIME_MS;
+    // TODO: rename "time" to refer to the current step number (consistent with
+    // the entities classes), and use some other name for real time.
     while (this.time + stepTime < time) {
       this.time += stepTime;
 
