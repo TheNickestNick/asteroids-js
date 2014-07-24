@@ -82,10 +82,10 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
   Ship.prototype.stopFiring = function() { this.firing = false; }
 
   Ship.prototype.launchMissile = function() {
-    if (this.nextMissileTime < this.aliveTime) {
+    if (this.nextMissileTime < this.time) {
       this.spawn(
         Missile.create().init(this.x, this.y, this.velx, this.vely, this.r));
-      this.nextMissileTime = this.aliveTime + Ship.MISSILE_RELOAD_TIME;
+      this.nextMissileTime = this.time + Ship.MISSILE_RELOAD_TIME;
     }
   };
 
@@ -105,11 +105,11 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
   };
 
   Ship.prototype.invincible = function() {
-    return this.aliveTime < this.invincibleUntil;
+    return this.time < this.invincibleUntil;
   };
 
   Ship.prototype.makeInvincible = function(length) {
-    this.invincibleUntil = this.aliveTime + length;
+    this.invincibleUntil = this.time + length;
   };
 
   Ship.prototype.fire = function(dirOffset) {
@@ -158,7 +158,7 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
   
     var fillStyle = null;
     if (this.invincible()) {
-      fillStyle = this.aliveTime % 2 == 0 ? 'black' : null;
+      fillStyle = this.time % 2 == 0 ? 'black' : null;
     }
 
     meshes.ship.draw(ctx, fillStyle);

@@ -33,6 +33,8 @@ define(['./entity','./textures', './utils', './gfx', './bonus'],
   Asteroid.BONUS_SPAWN_CHANCE = 0.05;
 
   Asteroid.prototype.onDie = function() {
+    this.game.addPoints(this.size * 5);
+
     if (this.size > 1) {
       this.spawnChild();
       this.spawnChild();

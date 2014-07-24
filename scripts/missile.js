@@ -23,21 +23,28 @@ define(['./gfx', './entity', './meshes', './utils', './explosion2'],
       this.vely += Math.cos(this.r) * Missile.ACCELERATION;
     }
 
-    var path = Math.sin(this.aliveTime * 0.4) * this.path;
+    var path = Math.sin(this.time * 0.4) * this.path;
     this.x += Math.cos(this.r) * path;
     this.y += Math.sin(this.r) * path;
   };
 
   Missile.prototype.onDie = function() {
     if (this.ttl === 0) {
-      this.spawn(Explosion2.create().init(this.x, this.y, 60));
+      this.spawn(Explosion2.create().init(this.x, this.y, 100));
     }
   };
 
   Missile.prototype.onCollideWithAsteroid = function(asteroid) {
     this.die();
-    this.spawn(Explosion2.create().init(this.x, this.y, asteroid.boundingRadius));
+    this.spawn(Explosion2.create().init(this.x, this.y, 40));
     asteroid.die();
+  };
+
+  // TODO: i'd like to try this, but currently the missile blows up immediately upon launch :)
+  Missile.prototype.onCollideWithShip = function(ship) {
+    //this.die();
+    //this.spawn(Explosion2.create().init(this.x, this.y, 40));
+    //ship.die();
   };
 
   Missile.WIDTH = 8;

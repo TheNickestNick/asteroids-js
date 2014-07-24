@@ -1,5 +1,3 @@
 Need to layer objects when drawing.
 Explosion2s do not wrap across edges of screen.
-Explosion particles do not wrap across edges of screen.
-Explosion particles have a square pattern.
 Objects at edge of screen do not render across edge.

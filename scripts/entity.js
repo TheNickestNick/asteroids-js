@@ -16,7 +16,8 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.ttl = null;
     this.dead = false;
     // TODO: rename to just "time"
-    this.aliveTime = 0;
+    this.time = 0;
+    this.game = null;
   }
 
   Entity.prototype.onDie = abstract;
@@ -53,19 +54,21 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
   };
 
   Entity.prototype.spawn = function(entity) {
-    this.spawner.spawn(entity);
+    this.game.spawn(entity);
   };
   
   Entity.prototype.die = function() {
+    if (!this.dead) {
+      this.onDie();
+    }
     this.dead = true;
-    this.onDie();
   };
 
   Entity.prototype.step = function() {
     this.x += this.velx;
     this.y += this.vely;
     this.r += this.velr;
-    this.aliveTime++;
+    this.time++;
     this.updateTTL();
     this.onStep();
   };

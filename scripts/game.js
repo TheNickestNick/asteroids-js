@@ -16,7 +16,7 @@ define(
     this.height = height;
     this.time = 0;
     this.points = 0;
-    this.lives = 2;
+    this.lives = 0;
     this.level = 0;
 
     this.ship = null;
@@ -36,6 +36,7 @@ define(
   Game.prototype.start = function(startTime) {
     this.time = startTime;
     this.respawnIn = 0;
+    this.lives = 3;
     this.startNextLevel();
   };
 
@@ -188,7 +189,11 @@ define(
 
   Game.prototype.spawn = function(ent) {
     this.gameObjects.push(ent);
-    ent.spawner = this;
+    ent.game = this;
+  };
+
+  Game.prototype.addPoints = function(x) {
+    this.points += x;
   };
 
   return Game;

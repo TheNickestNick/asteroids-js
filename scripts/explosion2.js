@@ -2,18 +2,21 @@ define(['./entity', './gfx'], function(Entity, gfx) {
   // TODO: rehtink the naming and structure of the explosion classes
   var Explosion2 = Entity.subclass();
 
-  Explosion2.prototype.init = function(x, y, radius, duration, animationOnly) {
+  Explosion2.prototype.init = function(x, y, radius, duration, animationOnly, delay) {
     this.x = x;
     this.y = y;
     this.duration = duration || 8;
-    this.ttl = this.duration;
+    this.ttl = this.duration + delay;
     this.radius = radius || 50;
     this.animateOnly = !!animationOnly;
+    this.delay = delay || 0;
     return this;
   };
 
   Explosion2.prototype.onStep = function() {
-    this.boundingRadius = (this.aliveTime / this.duration) * this.radius;
+    if (this.time >= this.delay) {
+      this.boundingRadius = ((this.time - this.delay) / this.duration) * this.radius;
+    }
   };
 
   Explosion2.prototype.onCollideWithAsteroid = function(asteroid) {
@@ -24,7 +27,15 @@ define(['./entity', './gfx'], function(Entity, gfx) {
     }
   };
 
+  Explosion2.prototype.onCollideWithShip = function(ship) {
+    ship.die();
+  };
+
   Explosion2.prototype.onDraw = function(ctx) {
+    if (this.time < this.delay) {
+      return;
+    }
+
     this.circle(ctx, 'red', 0);
     this.circle(ctx, 'orange', 0.2);
     this.circle(ctx, 'yellow', 0.4);
@@ -33,12 +44,13 @@ define(['./entity', './gfx'], function(Entity, gfx) {
 
   Explosion2.prototype.circle = function(ctx, color, start) {
     var offset = this.duration * start;
+    var liveTime = this.time - this.delay;
 
-    if (this.aliveTime < offset) {
+    if (liveTime < offset) {
       return;
     }
 
-    var offsetTime = this.aliveTime - offset;
+    var offsetTime = liveTime - offset;
     var offsetDur = this.duration - offset;
 
     ctx.beginPath();
