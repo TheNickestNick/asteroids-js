@@ -2,4 +2,3 @@ Ship velocity is not reset when respawning.
 Need to layer objects when drawing.
 Explosion2s do not wrap across edges of screen.
 Ship bounding radius is smaller than ship so it gets ever so slightly clipped at edges of screen.
-Objects do not render in all 4 corners when they overlap the top left or bottom right of the screen.
