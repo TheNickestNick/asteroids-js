@@ -100,30 +100,41 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     var ctx = graphics.context();
     this.drawInternal(ctx, 0, 0);
 
-    if (this.x + this.boundingRadius > this.game.width) {
-      this.drawInternal(ctx, -this.game.width, 0);       
-    }
+    var overlapsLeft = this.x - this.boundingRadius < 0;
+    var overlapsRight = this.x + this.boundingRadius > this.game.width;
+    var overlapsTop = this.y - this.boundingRadius < 0;
+    var overlapsBottom = this.y + this.boundingRadius > this.game.height;
 
-    if (this.x - this.boundingRadius < 0) {
+    if (overlapsLeft) {
       this.drawInternal(ctx, this.game.width, 0);
     }
 
-    if (this.y + this.boundingRadius > this.game.height) {
-      this.drawInternal(ctx, 0, -this.game.height);
+    if (overlapsRight) {
+      this.drawInternal(ctx, -this.game.width, 0);       
     }
 
-    if (this.y - this.boundingRadius < 0) {
+    if (overlapsTop) {
       this.drawInternal(ctx, 0, this.game.height);
     }
 
-    if (this.x + this.boundingRadius > this.game.width && 
-        this.y + this.boundingRadius > this.game.height) {
-      this.drawInternal(ctx, -this.game.width, -this.game.height);
+    if (overlapsBottom) {
+      this.drawInternal(ctx, 0, -this.game.height);
     }
 
-    if (this.x - this.boundingRadius < 0 && 
-        this.y - this.boundingRadius < 0) {
+    if (overlapsLeft && overlapsTop) {
       this.drawInternal(ctx, this.game.width, this.game.height);
+    }
+
+    if (overlapsLeft && overlapsBottom) {
+      this.drawInternal(ctx, this.game.width, -this.game.height);
+    }
+
+    if (overlapsRight && overlapsTop) {
+      this.drawInternal(ctx, -this.game.width, this.game.height);
+    }
+
+    if (overlapsRight && overlapsBottom) {
+      this.drawInternal(ctx, -this.game.width, -this.game.height);
     }
   };
 
