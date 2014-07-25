@@ -10,11 +10,11 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
     this.firing = false;
     this.timeUntilShot = 0;
     this.nextMissileTime = 0;
-    this.boundingRadius = 10;
+    this.boundingRadius = 50;
     this.cannonReloadTime = Ship.TIME_BETWEEN_SHOTS;
     this.cannonRecoil = Ship.SHOT_RECOIL;
     this.cannons = 1;
-    this.brakes = false;
+    this.brakes = true;
     this.bomb = null;
     this.makeInvincible(Ship.RESPAWN_INVINCIBILITY_TIME);
     return this;
@@ -159,6 +159,7 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
     // TODO: figure out a way to abstract these transformations
     ctx.translate(this.x, this.y);
     ctx.rotate(this.r);
+    ctx.scale(3, 3);
   
     var fillStyle = null;
     if (this.invincible()) {

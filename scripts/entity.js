@@ -63,6 +63,7 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     }
   };
 
+  // TODO: now that we have a game reference, wrapping can go here
   Entity.prototype.step = function() {
     this.x += this.velx;
     this.y += this.vely;
@@ -76,9 +77,12 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     return !this.dead;
   };
 
-  Entity.prototype.draw = function(graphics) {
-    var ctx = graphics.context();
+  Entity.prototype.drawInternal = function(ctx, tx, ty) {
     ctx.save();
+    // TODO: make it so entities themselves don't have to transform
+    if (tx !== 0 || ty !== 0) {
+      ctx.translate(tx, ty);
+    }
     this.onDraw(ctx);
     ctx.restore();
 
@@ -89,6 +93,37 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
       ctx.lineWidth = 2;
       ctx.stroke();
       ctx.restore();
+    }
+  };
+
+  Entity.prototype.draw = function(graphics) {
+    var ctx = graphics.context();
+    this.drawInternal(ctx, 0, 0);
+
+    if (this.x + this.boundingRadius > this.game.width) {
+      this.drawInternal(ctx, -this.game.width, 0);       
+    }
+
+    if (this.x - this.boundingRadius < 0) {
+      this.drawInternal(ctx, this.game.width, 0);
+    }
+
+    if (this.y + this.boundingRadius > this.game.height) {
+      this.drawInternal(ctx, 0, -this.game.height);
+    }
+
+    if (this.y - this.boundingRadius < 0) {
+      this.drawInternal(ctx, 0, this.game.height);
+    }
+
+    if (this.x + this.boundingRadius > this.game.width && 
+        this.y + this.boundingRadius > this.game.height) {
+      this.drawInternal(ctx, -this.game.width, -this.game.height);
+    }
+
+    if (this.x - this.boundingRadius < 0 && 
+        this.y - this.boundingRadius < 0) {
+      this.drawInternal(ctx, this.game.width, this.game.height);
     }
   };
 
