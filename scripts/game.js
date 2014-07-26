@@ -164,7 +164,15 @@ define(
     return this.time != 0;
   };
 
+  Game.entityComparer = function(ent1, ent2) {
+    return ent1.layer - ent2.layer;
+  };
+
   Game.prototype.draw = function(graphics) {
+    // TODO: need to analyze whether this is GC-kosher. Does this create garbage
+    // underneath?
+    this.entities.sort(Game.entityComparer);
+
     for (var i = 0; i < this.entities.length; i++) {
       this.entities[i].draw(graphics);
     }

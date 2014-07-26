@@ -10,6 +10,7 @@ define(['./entity', './gfx', './explosion2'], function(Entity, gfx, Explosion2) 
     this.vely = vely + Math.cos(direction) * Bullet.VELOCITY;
     this.ttl = Bullet.TTL;
     this.boundingRadius = 0;
+    this.layer = -1;
     return this;
   };
 

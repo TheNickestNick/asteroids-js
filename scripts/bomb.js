@@ -7,6 +7,7 @@ define(['./gfx', './utils', './entity', './explosion2'],
     this.y = y;
     this.velx = velx;
     this.vely = vely;
+    this.layer = -1;
     return this;
   };
 

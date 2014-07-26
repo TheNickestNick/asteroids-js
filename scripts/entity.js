@@ -17,6 +17,7 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.dead = false;
     this.time = 0;
     this.game = null;
+    this.layer = 0;
   }
 
   Entity.prototype.onDie = abstract;

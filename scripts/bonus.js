@@ -2,6 +2,7 @@ define(['./entity', './gfx', './utils', './array'], function(Entity, gfx, utils,
   var Bonus = Entity.subclass(function() {
     this.type = 0;
     this.boundingRadius = 13;
+    this.layer = 1;
   });
 
   Bonus.MIN_TTL = 400;
