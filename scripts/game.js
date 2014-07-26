@@ -5,9 +5,6 @@ define(
      './bullet', './hud', './bonus', './audio', './missile', './explosion2', './geometry'], 
     function(Ship, Asteroid, meshes, array, Explosion, debug, Bullet, hud, Bonus, 
              audio, Missile, Explosion2, geometry) {
-  debug.define('pause', false);
-  debug.define('pause_step', 0);
-  debug.define('step_time', null);
 
   // TODO: we need the concept of a Player at some point.
   var Game = function(width, height) {
@@ -24,6 +21,11 @@ define(
     this.nextLevelIn = null;
 
     this.respawnIn = null;
+
+    this.paused = false;
+    debug.define('pause', this.pause.bind(this));
+    debug.define('step', this.step.bind(this));
+    debug.define('ship', (function() { return this.ship; }).bind(this));
   };
 
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
@@ -36,6 +38,10 @@ define(
     this.respawnIn = 0;
     this.lives = 3;
     this.startNextLevel();
+  };
+
+  Game.prototype.pause = function(shouldPause) {
+    this.paused = typeof shouldPause === 'boolean' ? shouldPause : true; 
   };
 
   Game.prototype.purgeDead = function() {
@@ -142,19 +148,13 @@ define(
   };
   
   Game.prototype.runUntil = function(time) {
-    var stepTime = debug.vars.step_time || Game.STEP_TIME_MS;
+    var stepTime = asteroids.step_time || Game.STEP_TIME_MS;
     // TODO: rename "time" to refer to the current step number (consistent with
     // the entities classes), and use some other name for real time.
     while (this.time + stepTime < time) {
       this.time += stepTime;
 
-      if (!debug.vars.pause) { 
-        this.step();
-      }
-    }
-
-    if (debug.vars.pause) {
-      for (; debug.vars.pause_step > 0; debug.vars.pause_step--) {
+      if (!this.paused) { 
         this.step();
       }
     }

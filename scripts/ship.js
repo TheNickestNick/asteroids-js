@@ -1,5 +1,5 @@
-define(['./meshes', './entity', './audio', './missile', './bomb', './explosion'], 
-    function(meshes, Entity, audio, Missile, Bomb, Explosion) {
+define(['./meshes', './entity', './audio', './missile', './bomb', './explosion', './utils'], 
+    function(meshes, Entity, audio, Missile, Bomb, Explosion, utils) {
   var Ship = Entity.subclass();
 
   Ship.prototype.init = function(x, y) {
@@ -11,9 +11,11 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
     this.timeUntilShot = 0;
     this.nextMissileTime = 0;
     this.boundingRadius = 10;
-    this.cannonReloadTime = Ship.TIME_BETWEEN_SHOTS;
-    this.cannonRecoil = Ship.SHOT_RECOIL;
+    this.cannonReloadTime = 15;
+    this.cannonRecoil = 0.1;
     this.cannons = 1;
+    this.cannonSpread = 0.08;
+    this.bulletTTL = 30;
     this.brakes = false;
     this.bomb = null;
     this.makeInvincible(Ship.RESPAWN_INVINCIBILITY_TIME);
@@ -22,9 +24,7 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
 
   Ship.RESPAWN_INVINCIBILITY_TIME = 80;
   Ship.ROTATION_SPEED = 0.1;
-  Ship.TIME_BETWEEN_SHOTS = 8; // TODO: cannon_reload_time
   Ship.MISSILE_RELOAD_TIME = 20;
-  Ship.SHOT_RECOIL = 0.2;
   Ship.ACCELERATION = 0.25;
 
   Ship.prototype.respawn = function(x, y) {
@@ -34,6 +34,17 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
     this.velx = 0;
     this.vely = 0;
     this.makeInvincible(Ship.RESPAWN_INVINCIBILITY_TIME);
+  };
+
+  Ship.prototype.increaseCannonAccuracy = function(amount) {
+    this.cannonSpread -= amount;
+    if (this.cannonSpread < 0) {
+      this.cannonSpread = 0
+    }
+  };
+
+  Ship.prototype.increaseCannonRange = function(amount) {
+    this.bulletTTL += amount;
   };
 
   Ship.prototype.enableBrakes = function() {
@@ -48,8 +59,10 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
   };
 
   Ship.prototype.decreaseReload = function() {
-    if (this.cannonReloadTime > 1) {
-      this.cannonReloadTime--;
+    this.cannonReloadTime *= 0.7;
+
+    if (this.cannonReloadTime < 1) {
+      this.cannonReloadTime = 1;
     }
   };
 
@@ -116,15 +129,11 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
     this.invincibleUntil = this.time + length;
   };
 
-  Ship.prototype.fire = function(dirOffset) {
-    dirOffset = dirOffset || 0;
-    var spread = 0.1;
-    var bdir = this.r + dirOffset + (Math.random()*spread - (spread/2));
-    this.spawn(Bullet.create().init(this.x, this.y, this.velx, this.vely, bdir));
-
-    // recoil
-    this.velx += Math.sin(bdir) * this.cannonRecoil;
-    this.vely -= Math.cos(bdir) * this.cannonRecoil;
+  Ship.prototype.fireCannon = function(posOffset, dirOffset) {
+    var x = this.x + posOffset * Math.cos(-this.r);
+    var y = this.y - posOffset * Math.sin(-this.r);
+    var dir = this.r + dirOffset + utils.random(-this.cannonSpread, this.cannonSpread);
+    this.spawn(Bullet.create().init(x, y, this.velx, this.vely, dir, this.bulletTTL));
   };
 
   Ship.prototype.onStep = function() {
@@ -141,13 +150,17 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion']
       this.timeUntilShot = this.cannonReloadTime;
 
       if (this.cannons == 1 || this.cannons == 3) {
-        this.fire(0);
+        this.fireCannon(0, 0);
       }
 
       if (this.cannons == 2 || this.cannons == 3) {
-        this.fire(-0.1);
-        this.fire(0.1);
+        this.fireCannon(0, 0.1);
+        this.fireCannon(0, -0.1);
       }
+
+      // recoil
+      this.velx += Math.sin(this.r) * this.cannonRecoil * this.cannons;
+      this.vely -= Math.cos(this.r) * this.cannonRecoil * this.cannons;
 
       audio.play(audio.sounds.shoot2);
     }

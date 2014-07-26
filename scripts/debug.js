@@ -1,14 +1,15 @@
+// TODO: rename this whole things "vars" or something like that
 define(function() {
-  if (!('debug_vars' in window)) {
-    window.debug_vars = {
+  if (!('asteroids' in window)) {
+    window.asteroids = {
     };
   }
 
   return {
     vars: window.debug_vars,
     define: function(name, def) {
-      if (!(name in window.debug_vars)) {
-        window.debug_vars[name] = def;
+      if (!(name in window.asteroids)) {
+        window.asteroids[name] = def;
       }
     }
   };

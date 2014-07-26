@@ -1,6 +1,5 @@
 ====BUGS====
-Need to layer objects when drawing.
-
+Draw sort is not stable, which can cause flickering for objects in same layer.
 
 ====FEATURES====
 Use webgl instead of canvas 2d.

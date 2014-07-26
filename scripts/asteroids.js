@@ -9,7 +9,7 @@ define(['./config', './graphics', './meshes', './input', './game', './debug', '.
     window.requestAnimationFrame(mainLoop);
 
 
-    if (debug.vars.skip_frames) {
+    if (asteroids.skip_frames) {
       if (skipCounter > 0) {
         skipCounter--;
         return;

@@ -9,40 +9,23 @@ define(['./entity', './gfx', './utils', './array'], function(Entity, gfx, utils,
   Bonus.MAX_TTL = 800;
 
   Bonus.TYPES = [{
-      color: 'red',
-      apply: function(ship) {
-        ship.decreaseReload();
-        console.log('Bonus: Decrease cannon reload time.');
-      }
+      color: 'red', text: 'Cannon reload time decreased.',
+      apply: function(ship) { ship.decreaseReload(); }
     }, {
-      color: 'blue', apply: function(ship) {
-        ship.decreaseRecoil();
-        console.log('Bonus: Decrease cannon recoil.');
-      },
+      color: 'red', text: 'Additional cannon.',
+      apply: function(ship) { ship.addCannon(); }
     }, {
-      color: 'red',
-      apply: function(ship) {
-        ship.addCannon();
-        console.log('Bonus: Additional cannon.');
-      }
+      color: 'red', text: 'Cannon range increased.',
+      apply: function(ship) { ship.increaseCannonRange(10); }
     }, {
-      color: 'green',
-      apply: function(ship, game) {
-        game.lives++;
-        console.log('Bonus: Extra life!');
-      }
+      color: 'red', text: 'Cannon accuracy increased.',
+      apply: function(ship) { ship.increaseCannonAccuracy(0.02); }
     }, {
-      color: 'green', 
-      apply: function(ship) {
-        console.log('Bonus: Temporarily invincible!');
-        ship.makeInvincible(200);
-      }
+      color: 'blue', text: 'Cannon recoil decreased.',
+      apply: function(ship) { ship.decreaseRecoil(); }
     }, {
-      color: 'blue', 
-      apply: function(ship) {
-        console.log('Bonus: Inertial brakes.');
-        ship.enableBrakes();
-      }
+      color: 'blue', text: 'Inertial brakes enabled.',
+      apply: function(ship) { ship.enableBrakes(); }
     }];
 
   Bonus.prototype.init = function(x, y) {
@@ -82,6 +65,7 @@ define(['./entity', './gfx', './utils', './array'], function(Entity, gfx, utils,
 
   Bonus.prototype.onCollideWithShip = function(ship) {
     this.type.apply(ship, this.game);
+    console.log(this.type.text);
     this.die();
   };
 

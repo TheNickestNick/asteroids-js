@@ -1,6 +1,4 @@
 define(['./debug'], function(debug) {
-  debug.define('play_sounds', true);
-
   var paths = {
     shoot: 'assets/shoot.wav',
     shoot2: 'assets/shoot2.wav',
@@ -35,6 +33,7 @@ define(['./debug'], function(debug) {
     init: function(callback) {
       var AC = window.AudioContext || window.webkitAudioContext;
       this.context = new AC();
+      this.muted = false;
 
       var outstanding = 0;
       for (var k in paths) {
@@ -53,8 +52,12 @@ define(['./debug'], function(debug) {
       }
     },
 
+    mute: function(shouldMute) {
+      this.muted = typeof shouldMute === 'boolean' ? !!shouldMute : true;
+    },
+
     play: function(buffer, offset) {
-      if (!debug.vars.play_sounds) {
+      if (this.muted) {
         return;
       }
 
@@ -67,6 +70,10 @@ define(['./debug'], function(debug) {
 
     sounds: {}
   };
+
+  debug.define('mute', function(m) {
+    audio.mute(m);
+  });
 
   return audio;
 });

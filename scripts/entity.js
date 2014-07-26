@@ -1,5 +1,5 @@
 define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
-  debug.define('draw_bounds', false);
+  debug.define('draw_entity_bounds', false);
 
   function abstract() {}
 
@@ -88,7 +88,7 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.onDraw(ctx);
     ctx.restore();
 
-    if (debug.vars.draw_bounds) {
+    if (asteroids.draw_entity_bounds) {
       ctx.save();
       gfx.circle(ctx, this.x, this.y, this.boundingRadius);
       ctx.strokeStyle = 'teal';
