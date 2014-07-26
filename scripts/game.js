@@ -1,13 +1,12 @@
 // TODO: this module stuff is getting ridiculous. Find a way to manage this better or make
 // it prettier.
 define(
-    ['./ship', './asteroid', './quadtree', './meshes', './array', './explosion', './debug', 
+    ['./ship', './asteroid', './meshes', './array', './explosion', './debug', 
      './bullet', './hud', './bonus', './audio', './missile', './explosion2', './geometry'], 
-    function(Ship, Asteroid, Quadtree, meshes, array, Explosion, debug, Bullet, hud, Bonus, 
+    function(Ship, Asteroid, meshes, array, Explosion, debug, Bullet, hud, Bonus, 
              audio, Missile, Explosion2, geometry) {
   debug.define('pause', false);
   debug.define('pause_step', 0);
-  debug.define('draw_quadtree', false);
   debug.define('step_time', null);
 
   // TODO: we need the concept of a Player at some point.
@@ -21,11 +20,10 @@ define(
 
     this.ship = null;
     // TODO: rename to entities
-    this.gameObjects = [];
+    this.entities = [];
     this.nextLevelIn = null;
 
     this.respawnIn = null;
-    this.quadtree = new Quadtree(0, 0, width, height, 3);
   };
 
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
@@ -40,17 +38,12 @@ define(
     this.startNextLevel();
   };
 
-  Game.prototype.stepAndWrap = function(ent) {
-    ent.step();
-    ent.wrap(this.width, this.height);
-  };
-
   Game.prototype.purgeDead = function() {
-    for (var i = 0; i < this.gameObjects.length; i++) {
-      var ent = this.gameObjects[i];
+    for (var i = 0; i < this.entities.length; i++) {
+      var ent = this.entities[i];
       if (!ent.isAlive()) {
         ent.free();
-        array.remove(this.gameObjects, i);
+        array.remove(this.entities, i);
         i--;
       }
     }
@@ -71,8 +64,8 @@ define(
 
   Game.prototype.isLevelOver = function() {
     // TODO: there's got to be a constant time way to do this
-    for (var i = 0; i < this.gameObjects.length; i++) {
-      if (this.gameObjects[i].constructor == Asteroid) {
+    for (var i = 0; i < this.entities.length; i++) {
+      if (this.entities[i].constructor == Asteroid) {
         return false;
       }
     }
@@ -98,18 +91,17 @@ define(
 
     // This can change as a result of updates and collisions. Cache the length at the
     // start of the step so that new entities don't get updated prematurely.
-    var numObjects = this.gameObjects.length;
+    var numEntities = this.entities.length;
   
-    for (var i = 0; i < numObjects; i++) {
-      var obj = this.gameObjects[i];
+    for (var i = 0; i < numEntities; i++) {
+      var obj = this.entities[i];
       obj.step();
-      obj.wrap(this.width, this.height);
     }
 
-    for (var i = 0; i < numObjects; i++) {
-      var obj1 = this.gameObjects[i];
-      for (var j = 0; j < this.gameObjects.length; j++) {
-        obj2 = this.gameObjects[j];
+    for (var i = 0; i < numEntities; i++) {
+      var obj1 = this.entities[i];
+      for (var j = 0; j < this.entities.length; j++) {
+        obj2 = this.entities[j];
 
         if (obj1 != obj2 && this.entitiesIntersect(obj1, obj2)) {
           obj1.onCollision(obj2);
@@ -173,12 +165,8 @@ define(
   };
 
   Game.prototype.draw = function(graphics) {
-    if (debug.vars.draw_quadtree) {
-      this.quadtree.draw(graphics);
-    }
-
-    for (var i = 0; i < this.gameObjects.length; i++) {
-      this.gameObjects[i].draw(graphics);
+    for (var i = 0; i < this.entities.length; i++) {
+      this.entities[i].draw(graphics);
     }
 
     hud.draw(graphics.context(), this);
@@ -190,7 +178,7 @@ define(
   };
 
   Game.prototype.spawn = function(ent) {
-    this.gameObjects.push(ent);
+    this.entities.push(ent);
     ent.game = this;
   };
 

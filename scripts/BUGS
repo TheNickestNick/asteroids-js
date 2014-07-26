@@ -1,4 +1,13 @@
-Ship velocity is not reset when respawning.
+====BUGS====
 Need to layer objects when drawing.
-Explosion2s do not wrap across edges of screen.
-Ship bounding radius is smaller than ship so it gets ever so slightly clipped at edges of screen.
+
+
+====FEATURES====
+Use webgl instead of canvas 2d.
+Audio for crashes and stuff.
+Balance bonuses.
+Exp and persistent rewards after you die.
+Notifications for things like bonuses and level ups.
+Cluster missiles instead of bombs.
+Alien ships.
+Homing missiles.

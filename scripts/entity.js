@@ -15,7 +15,6 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.velr = 0;
     this.ttl = null;
     this.dead = false;
-    // TODO: rename to just "time"
     this.time = 0;
     this.game = null;
   }
@@ -41,6 +40,7 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.onWrap(w, h);
   };
 
+  // TODO: change TTL to a "time to die"
   Entity.prototype.updateTTL = function() {
     if (this.ttl === null || this.ttl === 0) {
       return;
@@ -68,6 +68,7 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.x += this.velx;
     this.y += this.vely;
     this.r += this.velr;
+    this.wrap(this.game.width, this.game.height);
     this.time++;
     this.updateTTL();
     this.onStep();
