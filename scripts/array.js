@@ -15,6 +15,6 @@ define(function() {
 
       var index = Math.random() * arr.length;
       return arr[index >>> 0];
-    }
+    },
   };
-});
+})

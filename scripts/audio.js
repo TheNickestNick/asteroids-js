@@ -4,7 +4,8 @@ define(['./debug'], function(debug) {
     shoot2: 'assets/shoot2.wav',
     crash: 'assets/crash.wav',
     bonus: 'assets/bonus.wav',
-    bonus2: 'assets/bonus2.wav'
+    bonus2: 'assets/bonus2.wav',
+    missile: 'assets/missile.wav'
   };
 
   function loadSound(context, name, url, callback) {

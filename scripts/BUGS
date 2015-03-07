@@ -1,7 +1,8 @@
 ====BUGS====
-Draw sort is not stable, which can cause flickering for objects in same layer.
+Sometimes ship dies when you shoot an asteroid that's too close?
 
 ====FEATURES====
+Energy meters for guns, shields, and engines?
 Use webgl instead of canvas 2d.
 Audio for crashes and stuff.
 Balance bonuses.

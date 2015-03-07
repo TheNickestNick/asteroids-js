@@ -1,5 +1,16 @@
 define(['./meshes'], function(meshes) {
-  return {
+  var hud = {
+    ALERT_TIME: 100,
+    time: 0,
+    alert: function(text) {
+      this.alertText = text;
+      this.alertUntil = this.time + hud.ALERT_TIME;
+    },
+
+    step: function() {
+      this.time++;
+    },
+
     draw: function(ctx, game) {
       ctx.save();
       ctx.translate(game.width - 3, 0);
@@ -40,6 +51,20 @@ define(['./meshes'], function(meshes) {
       ctx.restore();
       end XP bar stuff**/
 
+      if (this.alertText && this.alertUntil && this.alertUntil > this.time) {
+        var td = this.alertUntil - this.time;
+        var ratio = td / hud.ALERT_TIME;
+        var fade = Math.sqrt(Math.sqrt(ratio)); // bias toward high numbers
+
+        ctx.save();
+        // TODO: this is probably not good for GC
+        ctx.fillStyle = 'rgba(200, 200, 200, ' + fade.toFixed(3)  + ')';
+        ctx.font = '24px Courier New';
+        var textSize = ctx.measureText(this.alertText);
+        ctx.fillText(this.alertText, game.width/2 - textSize.width/2, 30);
+        ctx.restore();
+      }
+
       if (game.over()) {
         ctx.save();
         ctx.fillStyle = 'red';
@@ -50,4 +75,6 @@ define(['./meshes'], function(meshes) {
       }
     }
   };
+
+  return hud;
 });

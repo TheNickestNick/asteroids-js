@@ -26,6 +26,7 @@ define(
     debug.define('pause', this.pause.bind(this));
     debug.define('step', this.step.bind(this));
     debug.define('ship', (function() { return this.ship; }).bind(this));
+    debug.define('alert', this.alert.bind(this));
   };
 
   Game.STEP_TIME_MS = 1000 / 30; // 30 fps
@@ -140,6 +141,7 @@ define(
       }
     }
 
+    hud.step();
     this.dirty = true;
   };
 
@@ -160,12 +162,16 @@ define(
     }
   };
 
+  Game.prototype.alert = function(text) {
+    hud.alert(text);
+  };
+
   Game.prototype.started = function() {
     return this.time != 0;
   };
 
   Game.entityComparer = function(ent1, ent2) {
-    return ent1.layer - ent2.layer;
+    return ent1.layer - ent2.layer || ent1.id - ent2.id;
   };
 
   Game.prototype.draw = function(graphics) {

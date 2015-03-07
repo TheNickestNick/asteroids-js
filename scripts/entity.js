@@ -18,8 +18,10 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.time = 0;
     this.game = null;
     this.layer = 0;
+    this.id = Entity.nextId++;
   }
 
+  Entity.nextId = 1;
   Entity.prototype.onDie = abstract;
   Entity.prototype.onStep = abstract;
   Entity.prototype.onDraw = abstract;

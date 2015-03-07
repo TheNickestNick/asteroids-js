@@ -90,6 +90,7 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion',
     }
     
     this.spawn(Explosion.create().init(this.x, this.y, 100, 80));
+    audio.play(audio.sounds.crash);
   };
 
   Ship.prototype.engageThrust = function() { this.thrusting = true; };
@@ -103,6 +104,7 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion',
       this.spawn(
         Missile.create().init(this.x, this.y, this.velx, this.vely, this.r));
       this.nextMissileTime = this.time + Ship.MISSILE_RELOAD_TIME;
+      audio.play(audio.sounds.missile);
     }
   };
 
@@ -162,7 +164,7 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion',
       this.velx += Math.sin(this.r) * this.cannonRecoil * this.cannons;
       this.vely -= Math.cos(this.r) * this.cannonRecoil * this.cannons;
 
-      audio.play(audio.sounds.shoot2);
+      audio.play(audio.sounds.shoot);
     }
 
     this.timeUntilShot -= 1;

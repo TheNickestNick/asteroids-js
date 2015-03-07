@@ -1,4 +1,5 @@
-define(['./entity', './gfx', './utils', './array'], function(Entity, gfx, utils, array) {
+define(['./entity', './gfx', './utils', './array', './audio'], 
+    function(Entity, gfx, utils, array, audio) {
   var Bonus = Entity.subclass(function() {
     this.type = 0;
     this.boundingRadius = 13;
@@ -9,22 +10,22 @@ define(['./entity', './gfx', './utils', './array'], function(Entity, gfx, utils,
   Bonus.MAX_TTL = 800;
 
   Bonus.TYPES = [{
-      color: 'red', text: 'Cannon reload time decreased.',
+      color: 'red', text: 'cannon reload time decreased',
       apply: function(ship) { ship.decreaseReload(); }
     }, {
-      color: 'red', text: 'Additional cannon.',
+      color: 'red', text: 'additional cannon',
       apply: function(ship) { ship.addCannon(); }
     }, {
-      color: 'red', text: 'Cannon range increased.',
+      color: 'red', text: 'cannon range increased',
       apply: function(ship) { ship.increaseCannonRange(10); }
     }, {
-      color: 'red', text: 'Cannon accuracy increased.',
+      color: 'red', text: 'cannon accuracy increased',
       apply: function(ship) { ship.increaseCannonAccuracy(0.02); }
     }, {
-      color: 'blue', text: 'Cannon recoil decreased.',
+      color: 'blue', text: 'cannon recoil decreased',
       apply: function(ship) { ship.decreaseRecoil(); }
     }, {
-      color: 'blue', text: 'Inertial brakes enabled.',
+      color: 'blue', text: 'inertial brakes enabled',
       apply: function(ship) { ship.enableBrakes(); }
     }];
 
@@ -43,7 +44,7 @@ define(['./entity', './gfx', './utils', './array'], function(Entity, gfx, utils,
     ctx.rotate(Math.PI/4);
 
     ctx.save();
-    ctx.rotate(-this.aliveTime * 0.12);
+    ctx.rotate(-this.time * 0.12);
     ctx.beginPath();
     ctx.rect(-6, -6, 12, 12);
     ctx.closePath();
@@ -53,7 +54,7 @@ define(['./entity', './gfx', './utils', './array'], function(Entity, gfx, utils,
 
     // TODO: add flicker when about to die
     ctx.save();
-    ctx.rotate(this.aliveTime * 0.12);
+    ctx.rotate(this.time * 0.12);
     ctx.beginPath();
     ctx.rect(-12, -12, 24, 24);
     ctx.closePath();
@@ -65,8 +66,9 @@ define(['./entity', './gfx', './utils', './array'], function(Entity, gfx, utils,
 
   Bonus.prototype.onCollideWithShip = function(ship) {
     this.type.apply(ship, this.game);
-    console.log(this.type.text);
+    this.game.alert(this.type.text);
     this.die();
+    audio.play(audio.sounds.bonus2);
   };
 
   return Bonus;
