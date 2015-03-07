@@ -43,16 +43,24 @@ define(function() {
     this.pressed[event.which] = false;
 
     if (event.which == Keys.SPACE) {
-      this.game.ship.stopFiring();
+      if (this.game.ship) {
+        this.game.ship.stopFiring();
+      }
     }
     else if (event.which == Keys.RIGHT) {
-      this.game.ship.turn(1);
+      if (this.game.ship) {
+        this.game.ship.turn(1);
+      }
     }
     else if (event.which == Keys.LEFT) {
-      this.game.ship.turn(-1);
+      if (this.game.ship) {
+        this.game.ship.turn(-1);
+      }
     }
     else if (event.which == Keys.UP) {
-      this.game.ship.disengageThrust();
+      if (this.game.ship) {
+        this.game.ship.disengageThrust();
+      }
     }
   };
 

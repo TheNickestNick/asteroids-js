@@ -66,7 +66,7 @@ define(['./debug'], function(debug) {
       var source = this.context.createBufferSource();
       source.buffer = buffer;
       source.connect(this.context.destination);
-      source.start(0, offset); 
+      source.start(0, offset || 0); 
     },
 
     sounds: {}
