@@ -4,9 +4,33 @@
     <title>Asteroids</title>
     <style>
       body { margin: 0; padding: 0 }
+      #help {
+        position: absolute;
+        margin-top: 5px;
+        z-index: 1000;
+        color: #555;
+        font-family: Courier, monospace;
+      }
+      #help td {
+        padding: 1px 7px 2px 7px;
+      }
+      #help td:first-child {
+        text-align:right;
+        border-right: solid 1px;
+      }
     </style>
     <script data-main="scripts/main" src="scripts/require.js"></script>
   </head>
   <body>
+    <div id="help"> 
+      <table cellspacing="0" cellpadding="0">
+        <tr><td>up</td><td>thrust</td></tr>
+        <tr><td>left</td><td>turn left</td></tr>
+        <tr><td>right</td><td>turn right</td></tr>
+        <tr><td>space</td><td>fire cannon</td></tr>
+        <tr><td>f</td><td>fire missile</td></tr>
+        <tr><td>b</td><td>deploy/detonate bomb</td></tr>
+      </table>
+    </div>
   </body>
 </html>
