@@ -1,4 +1,4 @@
-define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
+define(['./pooled', './debug', './gfx', './array'], function(pooled, debug, gfx, array) {
   debug.define('draw_entity_bounds', false);
 
   function abstract() {}
@@ -19,6 +19,8 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.game = null;
     this.layer = 0;
     this.id = Entity.nextId++;
+
+    this.deferredActions = [];
   }
 
   Entity.nextId = 1;
@@ -43,7 +45,8 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.onWrap(w, h);
   };
 
-  // TODO: change TTL to a "time to die"
+  // TODO: change TTL to a "time to die", so it doesn't need to be updated
+  // every frame.
   Entity.prototype.updateTTL = function() {
     if (this.ttl === null || this.ttl === 0) {
       return;
@@ -51,13 +54,37 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
 
     this.ttl >>>= 0;
     this.ttl--;
+    // TODO: Is this right? I think this should probably be "if ttl < 0"
     if (this.ttl === 0) {
       this.die();
     }
   };
 
+  Entity.prototype.updateDeferredActions = function() {
+    for (var i = 0; i < this.deferredActions.length; i++) {
+      var a = this.deferredActions[i];
+      a.ttl--;
+
+      // TODO: same as above - should this just be "if ttl < 0"?
+      if (a.ttl <= 0) {
+        array.remove(this.deferredActions, i);
+        i--;
+        if (a.callback) { 
+          a.callback(); 
+        }
+      }
+    }
+  };
+
   Entity.prototype.spawn = function(entity) {
     this.game.spawn(entity);
+  };
+
+  Entity.prototype.defer = function(ticks, callback) {
+    this.deferredActions.push({
+      ttl: ticks,
+      callback: callback
+    });
   };
   
   Entity.prototype.die = function() {
@@ -74,6 +101,7 @@ define(['./pooled', './debug', './gfx'], function(pooled, debug, gfx) {
     this.wrap(this.game.width, this.game.height);
     this.time++;
     this.updateTTL();
+    this.updateDeferredActions();
     this.onStep();
   };
 

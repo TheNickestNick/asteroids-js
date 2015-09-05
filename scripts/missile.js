@@ -6,16 +6,22 @@ define(['./gfx', './entity', './meshes', './utils', './explosion2'],
     this.x = x;
     this.y = y;
     this.r = direction;
-    this.velx = velx - Math.sin(this.r) * Missile.ACCELERATION;
-    this.vely = vely + Math.cos(this.r) * Missile.ACCELERATION;
-    this.ttl = 70;
+    this.velx = velx;
+    this.vely = vely;
+    this.ttl = Missile.TTL;
     this.boundingRadius = 5;
-    this.path = utils.random(-3, 3);
+    // TODO: rename this to something like "path magnitude"
+    this.path = utils.random(5, 10) * utils.randomSign();
+    this.pathOffset = 0;//utils.random(0, 1);
     return this;
   };
 
-  Missile.ACCELERATION = 1.0;
-  Missile.MAX_VELOCITY = 20;
+  Missile.TTL = 29;
+  Missile.ACCELERATION = 1.3;
+  Missile.MAX_VELOCITY = 10000;
+
+  // How quickly the magnitude of the sine wave path decreases over time.
+  Missile.PATH_DECAY = 0.95;
 
   Missile.prototype.onStep = function() {
     if (this.velx * this.velx + this.vely * this.vely < Missile.MAX_VELOCITY * Missile.MAX_VELOCITY) {
@@ -23,9 +29,11 @@ define(['./gfx', './entity', './meshes', './utils', './explosion2'],
       this.vely += Math.cos(this.r) * Missile.ACCELERATION;
     }
 
-    var path = Math.sin(this.time * 0.4) * this.path;
+    var path = Math.sin(this.time * 0.4 + this.pathOffset) * this.path;
     this.x += Math.cos(this.r) * path;
     this.y += Math.sin(this.r) * path;
+
+    this.path *= Missile.PATH_DECAY;
   };
 
   Missile.prototype.onDie = function() {
