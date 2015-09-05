@@ -18,7 +18,7 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion',
     this.bulletTTL = 30;
     this.brakes = false;
     this.bomb = null;
-    this.clusterMissiles = false;
+    this.missilesPerLaunch = 1;
     this.makeInvincible(Ship.RESPAWN_INVINCIBILITY_TIME);
     return this;
   };
@@ -52,8 +52,8 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion',
     this.brakes = true;
   };
 
-  Ship.prototype.enableClusterMissiles = function() {
-    this.clusterMissiles = true;
+  Ship.prototype.increaseMissilesPerLaunch = function() {
+    this.missilesPerLaunch++;
   };
 
   Ship.prototype.decreaseRecoil = function() {
@@ -109,20 +109,15 @@ define(['./meshes', './entity', './audio', './missile', './bomb', './explosion',
       return;
     }
 
-    if (this.clusterMissiles) {
-      var me = this;
-      for (var i = 0; i < 10; i++) {
-        this.defer(i*3, function() {
-          me.spawn(
-            Missile.create().init(me.x, me.y, me.velx, me.vely, me.r));
-        });
-      }
-    } else {
-      this.spawn(
-        Missile.create().init(this.x, this.y, this.velx, this.vely, this.r));
-      this.nextMissileTime = this.time + Ship.MISSILE_RELOAD_TIME;
-      audio.play(audio.sounds.missile);
+    var me = this;
+    for (var i = 0; i < this.missilesPerLaunch; i++) {
+      this.defer(i*2, function() {
+        me.spawn(
+          Missile.create().init(me.x, me.y, me.velx, me.vely, me.r));
+        audio.play(audio.sounds.missile);
+      });
     }
+    this.nextMissileTime = this.time + Ship.MISSILE_RELOAD_TIME;
   };
 
   Ship.prototype.dropOrDetonateBomb = function() {

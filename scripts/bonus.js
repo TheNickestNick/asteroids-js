@@ -22,6 +22,9 @@ define(['./entity', './gfx', './utils', './array', './audio'],
       color: 'red', text: 'cannon accuracy increased',
       apply: function(ship) { ship.increaseCannonAccuracy(0.02); }
     }, {
+      color: 'red', text: 'additional missile launcher',
+      apply: function(ship) { ship.increaseMissilesPerLaunch(); }
+    }, {
       color: 'blue', text: 'cannon recoil decreased',
       apply: function(ship) { ship.decreaseRecoil(); }
     }, {
